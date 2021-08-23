@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">Eccel Engenharia</string>
-    <string moduleConfig="true" name="CodePushDeploymentKey">BuildConfig.CODEPUSH_KEY</string>
 </resources>
