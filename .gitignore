@@ -10,6 +10,8 @@ buck-out/
 *.keystore
 !debug.keystore
 
+/android/.gradle
+
 ## Xcode
 build/
 *.pbxuser
