@@ -11,6 +11,8 @@ buck-out/
 !debug.keystore
 
 /android/.gradle
+/android/.idea
+/android/local.properties
 
 ## Xcode
 build/

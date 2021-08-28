@@ -159,7 +159,7 @@ android {
           resValue "string", "CodePushDeploymentKey", '""'
         }
         releaseStaging {
-          resValue "string", "CodePushDeploymentKey", '"kVZllnW-QlaHL1gqw_hb_SFLbD2-uc_Mvjm7H"'
+          resValue "string", "CodePushDeploymentKey", '"_wcElYpo8elq8wubrJ3vO0FeGSYn9qZvTmqIk"'
           matchingFallbacks = ['release']
         }
         release {
@@ -167,7 +167,7 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            resValue "string", "CodePushDeploymentKey", '"LUOJ2jF2TUAsQQpRVhAistZqqbAvv9DeRWpQ9"'
+            resValue "string", "CodePushDeploymentKey", '"aIb8_YJXtydw2zm5KXlrvR3XCNPc9T7z61yFR"'
         }
     }
 
@@ -215,6 +215,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation project(':react-native-splash-screen')
 }
 
 // Run this once to be able to run the application with BUCK
