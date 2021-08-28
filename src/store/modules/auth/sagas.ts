@@ -1,6 +1,7 @@
 ﻿import { all, call, put, takeLatest, SagaReturnType } from 'redux-saga/effects';
 import { Alert } from 'react-native';
 import { API_URL } from 'react-native-dotenv';
+import * as Sentry from '@sentry/react-native';
 import { AuthTypes, SignInRequestAction } from '~/store/types/auth.types';
 import api from '~/services/api';
 import { authenticate } from '~/services/authService';
@@ -41,6 +42,7 @@ export function* signIn({ payload }: SignInRequestAction): any {
     );
   } catch (error) {
     Alert.alert('Ops', `Ocorreu um erro : ${error} + ${API_URL}`);
+    Sentry.captureException(error);
     return yield put(signInFailure());
   }
 }

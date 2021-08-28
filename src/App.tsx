@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import '~/config/ReactotronConfig';
 import CodePush from 'react-native-code-push';
 import SplashScreen from 'react-native-splash-screen';
+import * as Sentry from '@sentry/react-native';
 
 import { store, persistor } from '~/store';
 
@@ -16,6 +17,10 @@ const App: React.FC = () => {
   useEffect(() => {
     SplashScreen.hide();
   }, []);
+
+  Sentry.init({
+    dsn: 'https://60ed7fbd7b8448fd974139cf9891689b@o794976.ingest.sentry.io/5935475',
+  });
 
   return (
     <NavigationContainer>
