@@ -13,7 +13,6 @@ target 'EccelEngenharia' do
   )
 
 
-  pod 'CodePush', :path => '../node_modules/react-native-code-push'
 
   target 'EccelEngenhariaTests' do
     inherit! :complete
