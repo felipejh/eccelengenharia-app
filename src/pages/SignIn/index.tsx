@@ -9,8 +9,8 @@ import {
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import { useDispatch, useSelector } from 'react-redux';
+import { API_URL } from 'react-native-dotenv';
 import { signInRequest } from '~/store/modules/auth/actions';
-
 import Button from '~/components/Button';
 import Input from '~/components/Input';
 
@@ -88,7 +88,11 @@ const SignIn: React.FC = () => {
                 formRef.current?.submitForm();
               }}
             >
-              {loading ? <ActivityIndicator color={colors.white} /> : 'ENTRAR'}
+              {loading ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                JSON.stringify(API_URL)
+              )}
             </Button>
           </FormContainer>
         </Background>
