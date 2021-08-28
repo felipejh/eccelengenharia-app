@@ -88,11 +88,7 @@ const SignIn: React.FC = () => {
                 formRef.current?.submitForm();
               }}
             >
-              {loading ? (
-                <ActivityIndicator color={colors.white} />
-              ) : (
-                JSON.stringify(API_URL)
-              )}
+              {loading ? <ActivityIndicator color={colors.white} /> : API_URL}
             </Button>
           </FormContainer>
         </Background>
