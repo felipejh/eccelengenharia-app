@@ -11,6 +11,7 @@ type LoginServiceResponse = SagaReturnType<typeof authenticate>;
 
 export function* signIn({ payload }: SignInRequestAction): any {
   try {
+    Alert.alert('fazendo login');
     const { user, password } = payload;
 
     const ws = '/v1/auth';
