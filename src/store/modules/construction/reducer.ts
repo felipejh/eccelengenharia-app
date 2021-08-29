@@ -35,6 +35,11 @@ export default function construction(
         draft.listConstruction = [];
         break;
       }
+      case '@auth/SIGN_OUT': {
+        draft.listConstruction = [];
+        draft.loading = false;
+        break;
+      }
       default:
     }
   });

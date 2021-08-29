@@ -3,6 +3,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '~/store/modules/rootReducer';
+import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
 import colors from '~/styles/colors';
 import { isConnected } from '~/utils/utils';
@@ -25,7 +26,7 @@ const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { listConstruction } = useSelector(
+  const { listConstruction, loading } = useSelector(
     (state: RootState) => state.construction,
   );
 
@@ -41,6 +42,10 @@ const Dashboard: FC<ConstructionProps> = () => {
   useEffect(() => {
     loadConstructionList();
   }, []);
+
+  useEffect(() => {
+    setFilteredConstructions(listConstruction);
+  }, [listConstruction]);
 
   const [borderFilter, setBorderFilter] = useState({});
   const [iconColor, setIconColor] = useState(colors.gray);
@@ -101,6 +106,11 @@ const Dashboard: FC<ConstructionProps> = () => {
           />
           <IconInputFilter name="search" size={20} color={iconColor} />
         </ContainerInputFilter>
+
+        <LoadingModal
+          text="Sincronizando dados..."
+          loading={listConstruction.length <= 0 && loading}
+        />
 
         <List
           data={filteredConstruction}
