@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SENTRY_DSN } from 'react-native-dotenv';
 import 'react-native-gesture-handler';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -19,7 +20,7 @@ const App: React.FC = () => {
   }, []);
 
   Sentry.init({
-    dsn: 'https://60ed7fbd7b8448fd974139cf9891689b@o794976.ingest.sentry.io/5935475',
+    dsn: SENTRY_DSN,
   });
 
   return (
