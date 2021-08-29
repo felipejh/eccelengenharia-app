@@ -10,7 +10,6 @@ import { signInSuccess, signInFailure } from '~/store/modules/auth/actions';
 type LoginServiceResponse = SagaReturnType<typeof authenticate>;
 
 export function* signIn({ payload }: SignInRequestAction): any {
-  Alert.alert('fazendo login');
   try {
     const { user, password } = payload;
 

@@ -1,5 +1,4 @@
-﻿import { Alert } from 'react-native';
-import {
+﻿import {
   AuthTypes,
   SignInFailureAction,
   SignInRequestAction,
@@ -13,7 +12,6 @@ export function signInRequest({
   user,
   password,
 }: SignInRequestProps): SignInRequestAction {
-  Alert.alert('Action');
   return {
     type: AuthTypes.SIGN_IN_REQUEST,
     payload: { user, password },
