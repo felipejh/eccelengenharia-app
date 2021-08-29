@@ -57,8 +57,6 @@ export function* getConstruction(): any {
       })),
   );
 
-  console.tron.log(data);
-
   return yield put(getConstructionListSuccess(data));
 }
 
