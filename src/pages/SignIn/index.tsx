@@ -35,8 +35,8 @@ const SignIn: React.FC = () => {
   const handleSignIn = ({ user, password }: SignInFormData) => {
     dispatch(
       signInRequest({
-        user: 'compras@eccelengenharia.com.br',
-        password: '99fff995f5437980d81bbd1cc6032cd1',
+        user,
+        password,
       }),
     );
   };
