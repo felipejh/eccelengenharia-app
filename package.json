@@ -30,6 +30,7 @@
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
     "immer": "^9.0.3",
+    "js-sha512": "^0.8.0",
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-code-push": "^7.0.1",
