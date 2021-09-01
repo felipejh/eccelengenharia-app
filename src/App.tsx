@@ -6,7 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import '~/config/ReactotronConfig';
-import CodePush from 'react-native-code-push';
+import codePush from 'react-native-code-push';
 import SplashScreen from 'react-native-splash-screen';
 import * as Sentry from '@sentry/react-native';
 
@@ -16,6 +16,10 @@ import Routes from '~/routes';
 
 const App: React.FC = () => {
   useEffect(() => {
+    codePush.sync({
+      installMode: codePush.InstallMode.IMMEDIATE,
+    });
+
     SplashScreen.hide();
   }, []);
 
@@ -35,6 +39,6 @@ const App: React.FC = () => {
   );
 };
 
-export default CodePush({
-  checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
+export default codePush({
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
 })(App);

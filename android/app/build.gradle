@@ -159,7 +159,7 @@ android {
           resValue "string", "CodePushDeploymentKey", '""'
         }
         releaseStaging {
-          resValue "string", "CodePushDeploymentKey", '"_wcElYpo8elq8wubrJ3vO0FeGSYn9qZvTmqIk"'
+          resValue "string", "CodePushDeploymentKey", '"v0TLvNcN86aR6R3jG0Q1wtgNngvWIVTPpb1tP"'
           matchingFallbacks = ['release']
         }
         release {
@@ -167,7 +167,7 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            resValue "string", "CodePushDeploymentKey", '"aIb8_YJXtydw2zm5KXlrvR3XCNPc9T7z61yFR"'
+            resValue "string", "CodePushDeploymentKey", '"wrnJmQkYGIZGu06_Qh4dc6Qy20BrDcOWQdGXA"'
         }
     }
 
