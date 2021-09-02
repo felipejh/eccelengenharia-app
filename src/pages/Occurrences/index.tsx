@@ -228,7 +228,6 @@ const Occurrences: React.FC = () => {
       setIsNewMarker(false);
     }
 
-    console.tron.log(occurrence);
     setSelectedMarker(occurrence);
     setShowCardClickMarker(true);
   };
@@ -276,7 +275,6 @@ const Occurrences: React.FC = () => {
   const handleConclusionOccurrence = async () => {
     setLoadingProcess(true);
 
-    console.tron.log(selectedMarker);
     if (userId && selectedMarker?.id) {
       try {
         await putConclusionOccurrence({
