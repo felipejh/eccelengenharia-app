@@ -1,8 +1,10 @@
 ﻿import styled from 'styled-components/native';
-import { FlatList } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import { Plan } from '~/models/plans.model';
 import colors from '~/styles/colors';
 import fonts from '~/styles/fonts';
+
+const window = Dimensions.get('window');
 
 export const Container = styled.SafeAreaView`
   flex: 1;
@@ -21,8 +23,11 @@ export const ContainerImgProgress = styled.View`
 export const ConstructionImg = styled.Image.attrs({
   resizeMode: 'cover',
 })`
-  width: 75px;
-  height: 90px;
+  /* width: 75px;
+  height: 90px; */
+  width: ${window.width / 3 - 22}px;
+  height: ${window.width / 3 - 11}px;
+
   border-radius: 8px;
 `;
 
@@ -128,8 +133,10 @@ export const ContainerPlan = styled.TouchableOpacity`
 export const ImgPlan = styled.Image.attrs({
   resizeMode: 'cover',
 })`
-  width: 170px;
-  height: 180px;
+  /* width: 170px;
+  height: 180px; */
+  width: ${window.width / 2 - 22}px;
+  height: ${window.width / 2 - 11}px;
   border-radius: 8px;
 `;
 

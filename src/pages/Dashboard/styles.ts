@@ -1,8 +1,10 @@
 ﻿import styled from 'styled-components/native';
 import Feather from 'react-native-vector-icons/Feather';
-import { FlatList } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import { Construction } from '~/models/construction.model';
 import colors from '~/styles/colors';
+
+const window = Dimensions.get('window');
 
 export const Container = styled.SafeAreaView`
   flex: 1;
@@ -45,6 +47,7 @@ export const List = styled(FlatList as new () => FlatList<Construction>).attrs({
 
 export const ContainerConstruction = styled.TouchableOpacity`
   justify-content: flex-start;
+  align-items: center;
   padding: 10px 5px;
   flex: 1;
 `;
@@ -52,9 +55,16 @@ export const ContainerConstruction = styled.TouchableOpacity`
 export const ImgConstruction = styled.Image.attrs({
   resizeMode: 'cover',
 })`
-  width: 170px;
-  height: 180px;
+  /* width: 170px;
+  height: 180px; */
+  width: ${window.width / 2 - 22}px;
+  height: ${window.width / 2 - 10}px;
   border-radius: 8px;
+  flex: 1;
+`;
+
+export const ContainerText = styled.View`
+  align-self: flex-start;
 `;
 
 export const TextTypeConstruction = styled.Text`

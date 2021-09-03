@@ -17,6 +17,7 @@ import {
   List,
   ContainerConstruction,
   ImgConstruction,
+  ContainerText,
   TextTypeConstruction,
   TextNameConstruction,
 } from './styles';
@@ -122,8 +123,10 @@ const Dashboard: FC<ConstructionProps> = () => {
               <ImgConstruction
                 source={{ uri: `data:image/png;base64,${item.imgBase64}` }}
               />
-              <TextTypeConstruction>{item.descType}</TextTypeConstruction>
-              <TextNameConstruction>{item.nome}</TextNameConstruction>
+              <ContainerText>
+                <TextTypeConstruction>{item.descType}</TextTypeConstruction>
+                <TextNameConstruction>{item.nome}</TextNameConstruction>
+              </ContainerText>
             </ContainerConstruction>
           )}
         />

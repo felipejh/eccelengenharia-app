@@ -11,6 +11,7 @@
     "iphone8plus": "react-native run-ios --simulator='iPhone 8 Plus'",
     "iphone11pro": "react-native run-ios --simulator='iPhone 11 Pro'",
     "iphone11promax": "react-native run-ios --simulator='iPhone 11 Pro Max'",
+    "ipadpro3": "react-native run-ios --simulator='iPad Pro (11-inch) (3rd generation)'",
     "devices_list": "xcrun simctl list devices",
     "test": "jest",
     "lint": "eslint ."
