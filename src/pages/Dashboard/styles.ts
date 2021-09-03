@@ -41,13 +41,13 @@ export const IconInputFilter = styled(Feather)`
 
 export const List = styled(FlatList as new () => FlatList<Construction>).attrs({
   contentContainerStyle: {
-    paddingBottom: 32,
+    paddingBottom: 52,
   },
 })``;
 
 export const ContainerConstruction = styled.TouchableOpacity`
   justify-content: flex-start;
-  align-items: center;
+  /* align-items: center; */
   padding: 10px 5px;
   flex: 1;
 `;
