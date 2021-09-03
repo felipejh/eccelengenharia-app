@@ -5,6 +5,7 @@ import {
   ScrollView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
@@ -33,6 +34,11 @@ const SignIn: React.FC = () => {
   const { loading } = useSelector((state: RootState) => state.auth);
 
   const handleSignIn = ({ user, password }: SignInFormData) => {
+    if (!user || !password) {
+      Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
+      return;
+    }
+
     dispatch(
       signInRequest({
         user,
