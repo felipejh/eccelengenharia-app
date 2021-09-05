@@ -12,6 +12,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.facebook.react.bridge.JSIModulePackage; // Reanimated
+import com.swmansion.reanimated.ReanimatedJSIModulePackage; // Reanimated
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -41,8 +43,15 @@ public class MainApplication extends Application implements ReactApplication {
         // bundle location from on each app start
         @Override
         protected String getJSBundleFile() {
-            return CodePush.getJSBundleFile();
+          return CodePush.getJSBundleFile();
         }
+
+        // Reanimated 2
+        @Override
+        protected JSIModulePackage getJSIModulePackage() {
+          return new ReanimatedJSIModulePackage();
+        }
+
       };
 
   @Override
