@@ -2,7 +2,7 @@
 import { Alert } from 'react-native';
 import { API_URL } from 'react-native-dotenv';
 import * as Sentry from '@sentry/react-native';
-// import { sha512 } from 'js-sha512';
+import { sha512 } from 'js-sha512';
 import { AuthTypes, SignInRequestAction } from '~/store/types/auth.types';
 import api from '~/services/api';
 import { authenticate } from '~/services/authService';
@@ -17,12 +17,8 @@ export function* signIn({ payload }: SignInRequestAction): any {
     const ws = '/v1/auth';
     const body = {
       email: user,
-      password,
+      password: sha512.hex(password),
     };
-    // const body = {
-    //   email: user,
-    //   password: sha512.hex(password),
-    // };
 
     const response: LoginServiceResponse = yield call(api.post, ws, body);
 
