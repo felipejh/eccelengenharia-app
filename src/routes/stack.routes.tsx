@@ -21,6 +21,7 @@ import { PlansProps } from '~/models/plans.model';
 
 import colors from '~/styles/colors';
 import { ConstructionProps } from '~/models/construction.model';
+import SignUp from '~/pages/SignUp';
 
 const Stack = createStackNavigator<StackParamList>();
 
@@ -85,14 +86,23 @@ export const StackRoutes: FC = () => {
   return (
     <Stack.Navigator headerMode="none">
       {!isSigned ? (
-        <Stack.Screen
-          name="SignIn"
-          component={SignIn}
-          options={() => ({
-            headerTitle: '',
-            headerTransparent: true,
-          })}
-        />
+        <>
+          <Stack.Screen
+            name="SignIn"
+            component={SignIn}
+            options={() => ({
+              headerTitle: '',
+              headerTransparent: true,
+            })}
+          />
+          <Stack.Screen
+            name="SignUp"
+            component={SignUp}
+            options={() => ({
+              headerTitle: 'Cadastre-se',
+            })}
+          />
+        </>
       ) : (
         <Stack.Screen name="Drawer" component={DrawerRoutes} />
       )}

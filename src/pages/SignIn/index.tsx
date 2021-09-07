@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +15,13 @@ import { signInRequest } from '~/store/modules/auth/actions';
 import Button from '~/components/Button';
 import Input from '~/components/Input';
 
-import { Background, FormContainer, Logo } from './styles';
+import {
+  Background,
+  FormContainer,
+  Logo,
+  SignUpButton,
+  SignUpText,
+} from './styles';
 
 import bgLogin from '~/assets/bg_login.png';
 import logo from '~/assets/logo_inicial.png';
@@ -27,6 +34,8 @@ interface SignInFormData {
 }
 
 const SignIn: React.FC = () => {
+  const navigation = useNavigation();
+
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
@@ -95,6 +104,10 @@ const SignIn: React.FC = () => {
             >
               {loading ? <ActivityIndicator color={colors.white} /> : 'ENTRAR'}
             </Button>
+
+            <SignUpButton onPress={() => navigation.navigate('SignUp')}>
+              <SignUpText>CADASTRE-SE</SignUpText>
+            </SignUpButton>
           </FormContainer>
         </Background>
       </ScrollView>
