@@ -3,6 +3,7 @@ import { Plan } from '~/models/plans.model';
 
 export type StackParamList = {
   SignIn: undefined;
+  SignUp: undefined;
   Dashboard: undefined;
   Drawer: undefined;
   Plans: Construction;
