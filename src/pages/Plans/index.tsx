@@ -74,7 +74,7 @@ const Plans: React.FC = () => {
 
   const handleFilter = (planName: string) => {
     if (planName) {
-      const filtered = filteredPlans.filter(p =>
+      const filtered = plans.filter(p =>
         p.name.toLowerCase().includes(planName.toLowerCase()),
       );
       setFilteredPlans(filtered);
