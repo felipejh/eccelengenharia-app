@@ -60,7 +60,7 @@ export const ImgConstruction = styled.Image.attrs({
   width: ${window.width / 2 - 22}px;
   height: ${window.width / 2 - 10}px;
   border-radius: 8px;
-  flex: 1;
+  /* flex: 1; */
 `;
 
 export const ContainerText = styled.View`

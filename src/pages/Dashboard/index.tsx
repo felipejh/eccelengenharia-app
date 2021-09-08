@@ -66,11 +66,12 @@ const Dashboard: FC<ConstructionProps> = () => {
 
   const handleFilter = (constructionName: string) => {
     if (constructionName) {
-      const filtered = filteredConstruction.filter(c =>
-        c.name.includes(constructionName),
+      const filtered = listConstruction.filter(c =>
+        c.name.toLowerCase().includes(constructionName.toLowerCase()),
       );
       setFilteredConstructions(filtered);
     } else {
+      console.tron.log(listConstruction);
       setFilteredConstructions(listConstruction);
     }
   };
