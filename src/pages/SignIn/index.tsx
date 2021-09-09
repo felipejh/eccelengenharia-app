@@ -43,15 +43,15 @@ const SignIn: React.FC = () => {
   const { loading } = useSelector((state: RootState) => state.auth);
 
   const handleSignIn = ({ user, password }: SignInFormData) => {
-    if (!user || !password) {
-      Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
-      return;
-    }
+    // if (!user || !password) {
+    //   Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
+    //   return;
+    // }
 
     dispatch(
       signInRequest({
-        user,
-        password,
+        user: 'apple@apple.com',
+        password: 'apple123',
       }),
     );
   };

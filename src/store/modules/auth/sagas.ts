@@ -7,6 +7,7 @@ import { AuthTypes, SignInRequestAction } from '~/store/types/auth.types';
 import api from '~/services/api';
 import { authenticate } from '~/services/authService';
 import { signInSuccess, signInFailure } from '~/store/modules/auth/actions';
+import { allRequest } from '../all/actions';
 
 type LoginServiceResponse = SagaReturnType<typeof authenticate>;
 
@@ -33,7 +34,7 @@ export function* signIn({ payload }: SignInRequestAction): any {
 
     api.defaults.headers.Authorization = `Bearer ${token}`;
 
-    return yield put(
+    yield put(
       signInSuccess({
         token,
         displayName: data.user.data.displayName,
@@ -41,6 +42,8 @@ export function* signIn({ payload }: SignInRequestAction): any {
         userId: data.user.entity.id,
       }),
     );
+
+    return yield put(allRequest());
   } catch (error) {
     Alert.alert('Ops', `Ocorreu um erro : ${error} + ${API_URL}`);
     Sentry.captureException(error);

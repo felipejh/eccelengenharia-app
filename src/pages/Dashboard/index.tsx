@@ -27,9 +27,11 @@ const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { listConstruction, loading } = useSelector(
+  const { listConstruction, loading: loadingConstruction } = useSelector(
     (state: RootState) => state.construction,
   );
+
+  const { loading: loadingAll } = useSelector((state: RootState) => state.all);
 
   const [filteredConstruction, setFilteredConstructions] =
     useState<Array<Construction>>(listConstruction);
@@ -40,9 +42,9 @@ const Dashboard: FC<ConstructionProps> = () => {
     }
   }
 
-  useEffect(() => {
-    loadConstructionList();
-  }, []);
+  // useEffect(() => {
+  //   loadConstructionList();
+  // }, []);
 
   useEffect(() => {
     setFilteredConstructions(listConstruction);
@@ -111,7 +113,7 @@ const Dashboard: FC<ConstructionProps> = () => {
 
         <LoadingModal
           text="Sincronizando dados..."
-          loading={listConstruction.length <= 0 && loading}
+          loading={listConstruction.length <= 0 && loadingAll}
         />
 
         <List
