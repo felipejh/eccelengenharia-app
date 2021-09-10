@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
+import { useDispatch, useSelector } from 'react-redux';
 import { Plan, PlansScreenRouteProp } from '~/models/plans.model';
 
 import InputFilter from '~/components/InputFilter';
@@ -35,11 +35,14 @@ import {
   TextTypePlan,
   TextNamePlan,
 } from './styles';
-import { getPlansList } from '~/services/plansService';
+import { isConnected } from '~/utils/utils';
+import { getPlanListRequest } from '~/store/modules/plan/actions';
+import { RootState } from '~/store/modules/rootReducer';
 
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const {
     id: constructionId,
@@ -49,22 +52,13 @@ const Plans: React.FC = () => {
     pendingOccurrences = 0,
   } = route.params;
 
-  const [plans, setPlans] = useState<Array<Plan>>([]);
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const { listPlans } = useSelector((state: RootState) => state.plan);
 
   async function loadPlans() {
-    setLoading(true);
-    try {
-      const response = await getPlansList({ constructionId });
-      setPlans(response);
-      setFilteredPlans(response);
-      setLoading(false);
-    } catch (error) {
-      setPlans([]);
-      setFilteredPlans([]);
-      setLoading(false);
-      Alert.alert('Ops', `Ocorreu um erro: ${error}`);
+    if (await isConnected()) {
+      dispatch(getPlanListRequest(constructionId));
     }
   }
 
@@ -72,14 +66,18 @@ const Plans: React.FC = () => {
     loadPlans();
   }, []);
 
+  useEffect(() => {
+    setFilteredPlans(listPlans);
+  }, [listPlans]);
+
   const handleFilter = (planName: string) => {
     if (planName) {
-      const filtered = plans.filter(p =>
+      const filtered = listPlans.filter(p =>
         p.name.toLowerCase().includes(planName.toLowerCase()),
       );
       setFilteredPlans(filtered);
     } else {
-      setFilteredPlans(plans);
+      setFilteredPlans(listPlans);
     }
   };
 
@@ -144,9 +142,9 @@ const Plans: React.FC = () => {
         <List
           data={filteredPlans}
           keyExtractor={(plan: Plan) => String(plan.id)}
-          onRefresh={loadPlans}
+          // onRefresh={loadPlans}
           numColumns={2}
-          refreshing={loading}
+          // refreshing={loading}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handleNavigateToPlan(item)}>

@@ -74,7 +74,7 @@ export function* getAllList(): any {
     return yield put(allSuccess());
   } catch (error) {
     Sentry.captureException(error);
-    return yield yield put(allFailure());
+    return yield put(allFailure());
   }
 }
 
