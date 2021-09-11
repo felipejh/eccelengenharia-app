@@ -67,7 +67,11 @@ const Plans: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setFilteredPlans(listPlans);
+    const listPlansConstruction = listPlans.filter(
+      plan => plan.constructionId === constructionId,
+    );
+
+    setFilteredPlans(listPlansConstruction);
   }, [listPlans]);
 
   const handleFilter = (planName: string) => {
@@ -149,9 +153,7 @@ const Plans: React.FC = () => {
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handleNavigateToPlan(item)}>
               <ImgPlan
-                source={{
-                  uri: item.img,
-                }}
+                source={{ uri: `data:image/png;base64,${item.imgBase64}` }}
               />
               <TextTypePlan>{item.descType}</TextTypePlan>
               <TextNamePlan>{item.nome}</TextNamePlan>

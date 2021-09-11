@@ -1,5 +1,6 @@
 import { produce } from 'immer';
 import { Plan } from '~/models/plans.model';
+import { AuthActionProps, AuthTypes } from '~/store/types/auth.types';
 import { PlanActionProps, PlanActionTypes } from '~/store/types/plan.types';
 
 interface StateProps {
@@ -14,7 +15,7 @@ const INITIAL_STATE: StateProps = {
 
 export default function plan(
   state = INITIAL_STATE,
-  action: PlanActionProps,
+  action: PlanActionProps | AuthActionProps,
 ): StateProps {
   return produce(state, draft => {
     switch (action.type) {
@@ -28,6 +29,11 @@ export default function plan(
         break;
       }
       case PlanActionTypes.GET_PLAN_LIST_FAILURE: {
+        draft.loading = false;
+        break;
+      }
+      case AuthTypes.SIGN_OUT: {
+        draft.listPlans = [];
         draft.loading = false;
         break;
       }

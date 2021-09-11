@@ -73,7 +73,6 @@ const Dashboard: FC<ConstructionProps> = () => {
       );
       setFilteredConstructions(filtered);
     } else {
-      console.tron.log(listConstruction);
       setFilteredConstructions(listConstruction);
     }
   };

@@ -27,6 +27,7 @@ export interface Plan {
   obraId: Construction['id'];
   constructionId: Construction['id'];
   url: string;
+  imagem: string;
   img: string;
   usuarioCreateId: number;
   userCreateId: number;
@@ -34,4 +35,5 @@ export interface Plan {
   userUpdatedId: number;
   createdAt: string;
   updatedAt: string;
+  imgBase64: string;
 }

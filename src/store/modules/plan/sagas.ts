@@ -9,9 +9,24 @@ import {
 } from '~/store/types/plan.types';
 import { getPlanListFailure, getPlanListSuccess } from './actions';
 import getConstructionType from '~/utils/getConstructionType';
+import { Plan } from '~/models/plans.model';
 
 interface Props {
   constructionId: number;
+}
+
+async function teste() {
+  try {
+    const response = await api.get(
+      `/api/v1/image/base64/5cb87H_crop_imagem.jpg`,
+    );
+
+    const b = response.data.base64;
+
+    return b;
+  } catch {
+    return 'NAO BOMBOU';
+  }
 }
 
 export function* getPlan({ payload }: { payload: Props }): any {
@@ -27,22 +42,43 @@ export function* getPlan({ payload }: { payload: Props }): any {
       return yield put(getPlanListFailure());
     }
 
-    const newPlans = response.data
-      .filter(plan => plan.obraId === constructionId)
-      .map(c => ({
-        ...c,
-        name: c.nome,
-        constructionId: c.obraId,
-        type: c.tipo,
-        descType: getConstructionType(c.tipo),
-        active: c.ativo,
-        userCreateId: c.usuarioCreateId,
-        userUpdatedId: c.usuarioUpdateId,
-        img: `${API_URL}${c.url}`,
-      }));
-    console.tron.log(newPlans);
+    // const data: Array<Plan> = yield all(
+    //   response.data
+    //     .filter(plan => plan.obraId === constructionId)
+    //     .map(async c => ({
+    //       ...c,
+    //       name: c.nome,
+    //       constructionId: c.obraId,
+    //       type: c.tipo,
+    //       descType: getConstructionType(c.tipo),
+    //       active: c.ativo,
+    //       userCreateId: c.usuarioCreateId,
+    //       userUpdatedId: c.usuarioUpdateId,
+    //       img: `${API_URL}${c.url}`,
+    //       imgBase64: await (
+    //         await api.get(`/api/v1/image/base64/${c.imagem}`)
+    //       ).data.base64,
+    //     })),
+    // );
+    const data: Array<Plan> = yield all(
+      response.data
+        .filter(plan => plan.obraId === constructionId)
+        .map(async c => ({
+          ...c,
+          name: c.nome,
+          constructionId: c.obraId,
+          type: c.tipo,
+          descType: getConstructionType(c.tipo),
+          active: c.ativo,
+          userCreateId: c.usuarioCreateId,
+          userUpdatedId: c.usuarioUpdateId,
+          img: `${API_URL}${c.url}`,
+          imgBase64: await teste(),
+        })),
+    );
+    console.tron.log(data);
 
-    return yield put(getPlanListSuccess(newPlans));
+    return yield put(getPlanListSuccess(data));
   } catch (error) {
     Sentry.captureException(error);
     return yield put(getPlanListFailure());
