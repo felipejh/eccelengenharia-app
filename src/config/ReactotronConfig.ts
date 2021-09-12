@@ -22,7 +22,8 @@ if (__DEV__) {
   //   .connect();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const tron = Reactotron.configure({ host })
+  const tron = Reactotron.setAsyncStorageHandler!(AsyncStorage)
+    .configure({ host })
     .useReactNative()
     .use(reactotronRedux())
     .use(reactotronSaga({ except: [''] }))

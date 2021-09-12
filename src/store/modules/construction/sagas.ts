@@ -10,6 +10,7 @@ import {
   getConstructionListFailure,
 } from '~/store/modules/construction/actions';
 import { Construction } from '~/models/construction.model';
+import { getImgSystemPath } from '~/utils/utils';
 
 type GetConstructionServiceResponse = SagaReturnType<
   typeof getConstructionList
@@ -51,9 +52,7 @@ export function* getConstruction(): any {
         userCreatedId: c.usuarioCreateId,
         userUpdatedId: c.usuarioUpdateId,
         img: `${API_URL}${c.url}`,
-        imgBase64: await (
-          await api.get(`/api/v1/image/base64/${c.imagem}`)
-        ).data.base64,
+        imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
       })),
   );
 

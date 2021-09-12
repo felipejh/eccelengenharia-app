@@ -1,5 +1,6 @@
 ﻿import React, { FC, useState, useEffect } from 'react';
 // import { RefreshControl } from 'react-native';
+import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '~/store/modules/rootReducer';
@@ -42,9 +43,9 @@ const Dashboard: FC<ConstructionProps> = () => {
     }
   }
 
-  // useEffect(() => {
-  //   loadConstructionList();
-  // }, []);
+  useEffect(() => {
+    loadConstructionList();
+  }, []);
 
   useEffect(() => {
     setFilteredConstructions(listConstruction);
@@ -123,7 +124,12 @@ const Dashboard: FC<ConstructionProps> = () => {
           renderItem={({ item }) => (
             <ContainerConstruction onPress={() => handleNavigateToPlans(item)}>
               <ImgConstruction
-                source={{ uri: `data:image/png;base64,${item.imgBase64}` }}
+                source={{
+                  uri:
+                    Platform.OS === 'android'
+                      ? `file://${item.imgSystemPath}`
+                      : `${item.imgSystemPath}`,
+                }}
               />
               <ContainerText>
                 <TextTypeConstruction>{item.descType}</TextTypeConstruction>

@@ -1,11 +1,4 @@
-import {
-  all,
-  takeLatest,
-  put,
-  SagaReturnType,
-  call,
-  race,
-} from 'redux-saga/effects';
+import { all, takeLatest, put, SagaReturnType, call } from 'redux-saga/effects';
 import { API_URL } from 'react-native-dotenv';
 import * as Sentry from '@sentry/react-native';
 import { Alert } from 'react-native';
@@ -22,6 +15,7 @@ import { Occurrence } from '~/models/occurrences.model';
 import { Checklist } from '~/models/checklist.model';
 import getConstructionType from '~/utils/getConstructionType';
 import { getPlanListSuccess } from '../plan/actions';
+import { getImgSystemPath } from '~/utils/utils';
 
 type GetAllServiceResponse = SagaReturnType<typeof getAll>;
 
@@ -34,7 +28,7 @@ interface ResponseDataProps {
   checklist: Array<Checklist>;
 }
 
-function* getObras(obras: Array<Construction>) {
+function* getConstructionList(obras: Array<Construction>) {
   const data: Array<Construction> = yield all(
     obras
       .sort((a, b) => {
@@ -53,47 +47,27 @@ function* getObras(obras: Array<Construction>) {
         userCreatedId: c.usuarioCreateId,
         userUpdatedId: c.usuarioUpdateId,
         img: `${API_URL}${c.url}`,
-        imgBase64: await (
-          await api.get(`/api/v1/image/base64/${c.imagem}`)
-        ).data.base64,
+        imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
       })),
   );
+
   return data;
 }
 
-function* getPlantas(plantas: Array<Plan>) {
+function* getPlanList(plantas: Array<Plan>) {
   const data: Array<Plan> = yield all(
-    plantas.map(async c => {
-      try {
-        // const response = await api.get(`/api/v1/image/base64/${c.imagem}`);
-        // const { base64: imgBase64 } = response.data;
-
-        return {
-          ...c,
-          name: c.nome,
-          constructionId: c.obraId,
-          type: c.tipo,
-          descType: getConstructionType(c.tipo),
-          active: c.ativo,
-          userCreateId: c.usuarioCreateId,
-          userUpdatedId: c.usuarioUpdateId,
-          img: `${API_URL}${c.url}`,
-          // imgBase64,
-        };
-      } catch {
-        return {
-          ...c,
-          name: c.nome,
-          constructionId: c.obraId,
-          type: c.tipo,
-          descType: getConstructionType(c.tipo),
-          active: c.ativo,
-          userCreateId: c.usuarioCreateId,
-          userUpdatedId: c.usuarioUpdateId,
-          img: `${API_URL}${c.url}`,
-        };
-      }
-    }),
+    plantas.map(async c => ({
+      ...c,
+      name: c.nome,
+      constructionId: c.obraId,
+      type: c.tipo,
+      descType: getConstructionType(c.tipo),
+      active: c.ativo,
+      userCreateId: c.usuarioCreateId,
+      userUpdatedId: c.usuarioUpdateId,
+      img: `${API_URL}${c.url}`,
+      imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
+    })),
   );
 
   return data;
@@ -119,16 +93,13 @@ export function* getAllList(): any {
       checklists,
     }: ResponseDataProps = response.data;
 
-    const { construction, plan } = yield all({
-      construction: call(() => getObras(obras)),
-      // plan: call(() => getPlantas(plantas)),
+    const { constructionList, planList } = yield all({
+      constructionList: call(() => getConstructionList(obras)),
+      planList: call(() => getPlanList(plantas)),
     });
 
-    // console.tron.log(construction);
-    // console.tron.log(plan);
-
-    yield put(getConstructionListSuccess(construction));
-    // yield put(getPlanListSuccess(plan));
+    yield put(getConstructionListSuccess(constructionList));
+    yield put(getPlanListSuccess(planList));
     return yield put(allSuccess());
   } catch (error) {
     Sentry.captureException(error);

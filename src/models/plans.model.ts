@@ -35,5 +35,5 @@ export interface Plan {
   userUpdatedId: number;
   createdAt: string;
   updatedAt: string;
-  imgBase64: string;
+  imgSystemPath?: string;
 }

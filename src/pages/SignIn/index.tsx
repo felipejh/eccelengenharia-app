@@ -1,4 +1,4 @@
-﻿import React, { useRef } from 'react';
+﻿import React, { useRef, useEffect } from 'react';
 import {
   KeyboardAvoidingView,
   TextInput,
@@ -6,6 +6,7 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
@@ -41,6 +42,34 @@ const SignIn: React.FC = () => {
 
   const dispatch = useDispatch();
   const { loading } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    const requestCameraPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Cool Photo App Camera Permission',
+            message:
+              'Cool Photo App needs access to your camera ' +
+              'so you can take awesome pictures.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.tron.log('You can use the camera');
+        } else {
+          console.tron.log('Camera permission denied');
+        }
+      } catch (err) {
+        console.tron.warn(err);
+      }
+    };
+
+    requestCameraPermission();
+  }, []);
 
   const handleSignIn = ({ user, password }: SignInFormData) => {
     // if (!user || !password) {

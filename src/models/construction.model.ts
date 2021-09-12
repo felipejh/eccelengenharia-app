@@ -39,5 +39,5 @@ export interface Construction {
   userCreatedId: number;
   userUpdatedId: number;
   imagem: string;
-  imgBase64: string;
+  imgSystemPath?: string;
 }

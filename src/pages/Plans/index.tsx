@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +39,7 @@ import {
 import { isConnected } from '~/utils/utils';
 import { getPlanListRequest } from '~/store/modules/plan/actions';
 import { RootState } from '~/store/modules/rootReducer';
+import LoadingModal from '~/components/LoadingModal';
 
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
@@ -54,7 +56,7 @@ const Plans: React.FC = () => {
 
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
 
-  const { listPlans } = useSelector((state: RootState) => state.plan);
+  const { listPlans, loading } = useSelector((state: RootState) => state.plan);
 
   async function loadPlans() {
     if (await isConnected()) {
@@ -71,6 +73,7 @@ const Plans: React.FC = () => {
       plan => plan.constructionId === constructionId,
     );
 
+    console.tron.log(listPlansConstruction);
     setFilteredPlans(listPlansConstruction);
   }, [listPlans]);
 
@@ -114,6 +117,11 @@ const Plans: React.FC = () => {
           </ContainerProgress>
         </ContainerImgProgress>
 
+        <LoadingModal
+          text="Sincronizando dados..."
+          loading={listPlans.length <= 0 && loading}
+        />
+
         <ContainerOccurrences>
           <ContainerLabelOccurrences>
             <TextOccurrencesRegister>REGISTRO DE</TextOccurrencesRegister>
@@ -153,7 +161,12 @@ const Plans: React.FC = () => {
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handleNavigateToPlan(item)}>
               <ImgPlan
-                source={{ uri: `data:image/png;base64,${item.imgBase64}` }}
+                source={{
+                  uri:
+                    Platform.OS === 'android'
+                      ? `file://${item.imgSystemPath}`
+                      : `${item.imgSystemPath}`,
+                }}
               />
               <TextTypePlan>{item.descType}</TextTypePlan>
               <TextNamePlan>{item.nome}</TextNamePlan>
