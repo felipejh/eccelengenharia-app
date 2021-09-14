@@ -1,5 +1,6 @@
 ﻿import produce from 'immer';
 import { Construction } from '~/models/construction.model';
+import { AuthActionProps, AuthTypes } from '~/store/types/auth.types';
 import {
   ConstructionTypes,
   ConstructionActionProps,
@@ -17,7 +18,7 @@ const INITIAL_STATE: StateProps = {
 
 export default function construction(
   state = INITIAL_STATE,
-  action: ConstructionActionProps,
+  action: ConstructionActionProps | AuthActionProps,
 ): StateProps {
   return produce(state, draft => {
     switch (action.type) {
@@ -35,7 +36,7 @@ export default function construction(
         draft.listConstruction = [];
         break;
       }
-      case '@auth/SIGN_OUT': {
+      case AuthTypes.SIGN_OUT: {
         draft.listConstruction = [];
         draft.loading = false;
         break;

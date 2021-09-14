@@ -67,8 +67,9 @@ const SignIn: React.FC = () => {
         console.tron.warn(err);
       }
     };
-
-    requestCameraPermission();
+    if (Platform.OS === 'android') {
+      requestCameraPermission();
+    }
   }, []);
 
   const handleSignIn = ({ user, password }: SignInFormData) => {

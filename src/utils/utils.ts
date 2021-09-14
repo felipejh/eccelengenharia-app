@@ -1,4 +1,5 @@
 ﻿import NetInfo from '@react-native-community/netinfo';
+import { Platform } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 
 export async function isConnected(): Promise<boolean> {
@@ -15,11 +16,15 @@ export async function getImgSystemPath(
   imgName: string,
 ): Promise<string> {
   try {
-    const path = await RNFetchBlob.config({
-      path: `${RNFetchBlob.fs.dirs.PictureDir}/Eccel/${imgName}.jpg`,
+    const { config, fs } = RNFetchBlob;
+    const PictureDir =
+      Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
+
+    const path = await config({
+      path: `${PictureDir}/Eccel/${imgName}`,
     }).fetch('GET', imgUri);
 
-    return path.path();
+    return path.data;
   } catch {
     return '';
   }
