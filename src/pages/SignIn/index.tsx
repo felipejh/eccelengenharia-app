@@ -58,7 +58,7 @@ const SignIn: React.FC = () => {
             buttonPositive: 'OK',
           },
         );
-        if (!granted === PermissionsAndroid.RESULTS.GRANTED) {
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
           Alert.alert(
             'Este aplicativo não funcionará offline sem permissão da câmera',
           );
