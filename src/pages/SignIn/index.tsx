@@ -61,10 +61,12 @@ const SignIn: React.FC = () => {
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.tron.log('You can use the camera');
         } else {
-          console.tron.log('Camera permission denied');
+          Alert.alert(
+            'Este aplicativo não funcionará offline sem permissão da câmera',
+          );
         }
       } catch (err) {
-        console.tron.warn(err);
+        Alert.alert(`Ocorreu um erro ao solicitar permissão de câmera: ${err}`);
       }
     };
     if (Platform.OS === 'android') {
