@@ -4,7 +4,11 @@ import * as Sentry from '@sentry/react-native';
 import { Alert } from 'react-native';
 import { AllTypes } from '~/store/types/all.types';
 import { allSuccess, allFailure } from '~/store/modules/all/actions';
-import { getConstructionListSuccess } from '~/store/modules/construction/actions';
+import {
+  getConstructionListAllRequest,
+  getConstructionListFailure,
+  getConstructionListSuccess,
+} from '~/store/modules/construction/actions';
 import { getAll } from '~/services/allService';
 import api from '~/services/api';
 import { Group } from '~/models/groups.model';
@@ -14,7 +18,7 @@ import { Plan } from '~/models/plans.model';
 import { Occurrence } from '~/models/occurrences.model';
 import { Checklist } from '~/models/checklist.model';
 import getConstructionType from '~/utils/getConstructionType';
-import { getPlanListSuccess } from '../plan/actions';
+import { getPlanListAllRequest, getPlanListSuccess } from '../plan/actions';
 import { getImgSystemPath } from '~/utils/utils';
 
 type GetAllServiceResponse = SagaReturnType<typeof getAll>;
@@ -75,6 +79,9 @@ function* getPlanList(plantas: Array<Plan>) {
 
 export function* getAllList(): any {
   try {
+    yield put(getConstructionListAllRequest());
+    yield put(getPlanListAllRequest());
+
     const ws = '/api/v1/all';
 
     const response: GetAllServiceResponse = yield call(api.get, ws);
@@ -103,6 +110,8 @@ export function* getAllList(): any {
     return yield put(allSuccess());
   } catch (error) {
     Sentry.captureException(error);
+    yield put(getConstructionListFailure());
+    yield put(getPlanListAllRequest());
     return yield put(allFailure());
   }
 }

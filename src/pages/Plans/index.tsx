@@ -48,7 +48,7 @@ const Plans: React.FC = () => {
 
   const {
     id: constructionId,
-    img,
+    imgSystemPath,
     completionPercentage,
     solvedOccurrences = 0,
     pendingOccurrences = 0,
@@ -98,7 +98,14 @@ const Plans: React.FC = () => {
     <Container>
       <ConstructionCard>
         <ContainerImgProgress>
-          <ConstructionImg source={{ uri: img }} />
+          <ConstructionImg
+            source={{
+              uri:
+                Platform.OS === 'android'
+                  ? `file://${imgSystemPath}`
+                  : `${imgSystemPath}`,
+            }}
+          />
           <ContainerProgress>
             <TextProgress>Conclusão da obra</TextProgress>
             <ContainerProgressAndLabel>
@@ -117,10 +124,7 @@ const Plans: React.FC = () => {
           </ContainerProgress>
         </ContainerImgProgress>
 
-        <LoadingModal
-          text="Sincronizando dados..."
-          loading={listPlans.length <= 0 && loading}
-        />
+        <LoadingModal text="Carregando plantas..." loading={loading} />
 
         <ContainerOccurrences>
           <ContainerLabelOccurrences>

@@ -28,7 +28,7 @@ export function* getPlan({ payload }: { payload: Props }): any {
 
     const data: Array<Plan> = yield all(
       response.data
-        // .filter((plan: Plan) => plan.obraId === constructionId)
+        .filter((plan: Plan) => plan.obraId === constructionId)
         .map(async (c: Plan) => ({
           ...c,
           name: c.nome,

@@ -1,5 +1,6 @@
 import { Plan } from '~/models/plans.model';
 import {
+  GetPlanListAllRequestAction,
   GetPlanListFailureAction,
   GetPlanListRequestAction,
   GetPlanListSuccessAction,
@@ -29,5 +30,11 @@ export function getPlanListSuccess(
 export function getPlanListFailure(): GetPlanListFailureAction {
   return {
     type: PlanActionTypes.GET_PLAN_LIST_FAILURE,
+  };
+}
+
+export function getPlanListAllRequest(): GetPlanListAllRequestAction {
+  return {
+    type: PlanActionTypes.GET_PLAN_LIST_ALL_REQUEST,
   };
 }

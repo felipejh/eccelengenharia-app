@@ -4,6 +4,7 @@ import {
   GetConstructionListRequestAction,
   GetConstructionListSuccessAction,
   GetConstructionListFailureAction,
+  GetConstructionListAllRequestAction,
 } from '~/store/types/construction.types';
 
 export function getConstructionListRequest(): GetConstructionListRequestAction {
@@ -24,5 +25,11 @@ export function getConstructionListSuccess(
 export function getConstructionListFailure(): GetConstructionListFailureAction {
   return {
     type: ConstructionTypes.GET_CONSTRUCTION_LIST_FAILURE,
+  };
+}
+
+export function getConstructionListAllRequest(): GetConstructionListAllRequestAction {
+  return {
+    type: ConstructionTypes.GET_CONSTRUCTION_LIST_ALL_REQUEST,
   };
 }

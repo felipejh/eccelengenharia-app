@@ -36,6 +36,10 @@ export default function construction(
         draft.listConstruction = [];
         break;
       }
+      case ConstructionTypes.GET_CONSTRUCTION_LIST_ALL_REQUEST: {
+        draft.loading = true;
+        break;
+      }
       case AuthTypes.SIGN_OUT: {
         draft.listConstruction = [];
         draft.loading = false;

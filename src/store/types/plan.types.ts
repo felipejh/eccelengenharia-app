@@ -4,6 +4,7 @@ export enum PlanActionTypes {
   GET_PLAN_LIST_REQUEST = '@plan/GET_PLAN_LIST_REQUEST',
   GET_PLAN_LIST_SUCCESS = '@plan/GET_PLAN_LIST_SUCCESS',
   GET_PLAN_LIST_FAILURE = '@plan/GET_PLAN_LIST_FAILURE',
+  GET_PLAN_LIST_ALL_REQUEST = '@plan/GET_PLAN_LIST_ALL_REQUEST',
 }
 
 export interface GetPlanListRequestAction {
@@ -22,7 +23,12 @@ export interface GetPlanListFailureAction {
   type: PlanActionTypes.GET_PLAN_LIST_FAILURE;
 }
 
+export interface GetPlanListAllRequestAction {
+  type: PlanActionTypes.GET_PLAN_LIST_ALL_REQUEST;
+}
+
 export type PlanActionProps =
   | GetPlanListRequestAction
   | GetPlanListSuccessAction
-  | GetPlanListFailureAction;
+  | GetPlanListFailureAction
+  | GetPlanListAllRequestAction;
