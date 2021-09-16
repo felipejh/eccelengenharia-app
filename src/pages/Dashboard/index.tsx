@@ -28,14 +28,16 @@ const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const [descriptionLoading, setDescriptionLoading] = useState<string>('');
-
   const { listConstruction, loading: loadingConstruction } = useSelector(
     (state: RootState) => state.construction,
   );
 
   const { listPlans, loading: loadingPlans } = useSelector(
     (state: RootState) => state.plan,
+  );
+
+  const { listGroups, loading: loadingGroups } = useSelector(
+    (state: RootState) => state.groups,
   );
 
   const [filteredConstruction, setFilteredConstructions] =
@@ -54,16 +56,6 @@ const Dashboard: FC<ConstructionProps> = () => {
   useEffect(() => {
     setFilteredConstructions(listConstruction);
   }, [listConstruction]);
-
-  useEffect(() => {
-    if (loadingConstruction) {
-      setDescriptionLoading('obras');
-    }
-
-    if (loadingPlans) {
-      setDescriptionLoading('plantas');
-    }
-  }, [loadingConstruction, loadingPlans]);
 
   const [borderFilter, setBorderFilter] = useState({});
   const [iconColor, setIconColor] = useState(colors.gray);
@@ -126,10 +118,11 @@ const Dashboard: FC<ConstructionProps> = () => {
         </ContainerInputFilter>
 
         <LoadingModal
-          text={`Sincronizando dados de ${descriptionLoading}...`}
+          text="Sincronizando dados..."
           loading={
             (listConstruction.length <= 0 && loadingConstruction) ||
-            (listPlans.length <= 0 && loadingPlans)
+            (listPlans.length <= 0 && loadingPlans) ||
+            (listGroups.length <= 0 && loadingGroups)
           }
         />
 

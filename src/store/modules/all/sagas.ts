@@ -20,6 +20,11 @@ import { Checklist } from '~/models/checklist.model';
 import getConstructionType from '~/utils/getConstructionType';
 import { getPlanListAllRequest, getPlanListSuccess } from '../plan/actions';
 import { getImgSystemPath } from '~/utils/utils';
+import {
+  getGroupListAllRequest,
+  getGroupListFailure,
+  getGroupListSuccess,
+} from '../groups/actions';
 
 type GetAllServiceResponse = SagaReturnType<typeof getAll>;
 
@@ -81,6 +86,7 @@ export function* getAllList(): any {
   try {
     yield put(getConstructionListAllRequest());
     yield put(getPlanListAllRequest());
+    yield put(getGroupListAllRequest());
 
     const ws = '/api/v1/all';
 
@@ -103,15 +109,20 @@ export function* getAllList(): any {
     const { constructionList, planList } = yield all({
       constructionList: call(() => getConstructionList(obras)),
       planList: call(() => getPlanList(plantas)),
+      groupList: grupos,
     });
 
     yield put(getConstructionListSuccess(constructionList));
     yield put(getPlanListSuccess(planList));
+    yield put(getGroupListSuccess(grupos));
+
     return yield put(allSuccess());
   } catch (error) {
     Sentry.captureException(error);
     yield put(getConstructionListFailure());
     yield put(getPlanListAllRequest());
+    yield put(getGroupListFailure());
+
     return yield put(allFailure());
   }
 }

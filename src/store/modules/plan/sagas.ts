@@ -2,24 +2,27 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { Alert } from 'react-native';
 import { API_URL } from 'react-native-dotenv';
 import * as Sentry from '@sentry/react-native';
+import { AxiosResponse } from 'axios';
 import api from '~/services/api';
 import { PlanActionTypes } from '~/store/types/plan.types';
-import { getPlanListFailure, getPlanListSuccess } from './actions';
+import {
+  getPlanListFailure,
+  getPlanListRequest,
+  getPlanListSuccess,
+} from './actions';
 import getConstructionType from '~/utils/getConstructionType';
 import { Plan } from '~/models/plans.model';
 import { getImgSystemPath } from '~/utils/utils';
 
-interface Props {
-  constructionId: number;
-}
-
-export function* getPlan({ payload }: { payload: Props }): any {
+export function* getPlan({
+  payload,
+}: ReturnType<typeof getPlanListRequest>): any {
   try {
     const { constructionId } = payload;
 
     const ws = '/api/v1/plantas';
 
-    const response = yield call(api.get, ws);
+    const response: AxiosResponse<Array<Plan>> = yield call(api.get, ws);
 
     if (response.status !== 200) {
       Alert.alert('Ocorreu um erro ao buscar as plantas');
