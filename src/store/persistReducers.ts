@@ -6,7 +6,14 @@ export default (reducers: any) => {
     {
       key: '@sistemaconstrutora',
       storage: AsyncStorage,
-      whitelist: ['auth', 'construction', 'all', 'plan', 'groups'],
+      whitelist: [
+        'auth',
+        'construction',
+        'all',
+        'plan',
+        'groups',
+        'appointments',
+      ],
     },
     reducers,
   );
