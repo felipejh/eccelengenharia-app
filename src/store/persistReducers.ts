@@ -13,6 +13,7 @@ export default (reducers: any) => {
         'plan',
         'groups',
         'appointments',
+        'occurrences',
       ],
     },
     reducers,

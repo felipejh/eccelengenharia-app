@@ -40,6 +40,10 @@ const Dashboard: FC<ConstructionProps> = () => {
     (state: RootState) => state.groups,
   );
 
+  const { listOccurrences, loading: loadingOccurrences } = useSelector(
+    (state: RootState) => state.occurrences,
+  );
+
   const [filteredConstruction, setFilteredConstructions] =
     useState<Array<Construction>>(listConstruction);
 
@@ -122,7 +126,8 @@ const Dashboard: FC<ConstructionProps> = () => {
           loading={
             (listConstruction.length <= 0 && loadingConstruction) ||
             (listPlans.length <= 0 && loadingPlans) ||
-            (listGroups.length <= 0 && loadingGroups)
+            (listGroups.length <= 0 && loadingGroups) ||
+            (listOccurrences.length <= 0 && loadingOccurrences)
           }
         />
 
