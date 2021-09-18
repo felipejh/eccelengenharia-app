@@ -14,6 +14,7 @@ export default (reducers: any) => {
         'groups',
         'appointments',
         'occurrences',
+        'checklists',
       ],
     },
     reducers,

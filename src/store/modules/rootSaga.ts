@@ -7,6 +7,7 @@ import plan from '~/store/modules/plan/sagas';
 import groups from '~/store/modules/groups/sagas';
 import appointments from '~/store/modules/appointments/sagas';
 import occurrences from '~/store/modules/occurrences/sagas';
+import checklists from '~/store/modules/checklists/sagas';
 
 export default function* rootSaga(): any {
   return yield allSaga([
@@ -17,5 +18,6 @@ export default function* rootSaga(): any {
     groups,
     appointments,
     occurrences,
+    checklists,
   ]);
 }

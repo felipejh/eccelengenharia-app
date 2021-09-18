@@ -35,6 +35,11 @@ import {
   getOccurrenceListFailure,
   getOccurrenceListSuccess,
 } from '../occurrences/actions';
+import {
+  getChecklistListAllRequest,
+  getChecklistListFailure,
+  getChecklistListSuccess,
+} from '../checklists/actions';
 
 type GetAllServiceResponse = SagaReturnType<typeof getAll>;
 
@@ -44,7 +49,7 @@ interface ResponseDataProps {
   obras: Array<Construction>;
   plantas: Array<Plan>;
   ocorrencias: Array<Occurrence>;
-  checklist: Array<Checklist>;
+  checklists: Array<Checklist>;
 }
 
 function* getConstructionList(obras: Array<Construction>) {
@@ -99,6 +104,7 @@ export function* getAllList(): any {
     yield put(getGroupListAllRequest());
     yield put(getAppointmentListAllRequest());
     yield put(getOccurrenceListAllRequest());
+    yield put(getChecklistListAllRequest());
 
     const ws = '/api/v1/all';
 
@@ -124,12 +130,14 @@ export function* getAllList(): any {
       groupList,
       appointmentList,
       occurrenceList,
+      checklistList,
     } = yield all({
       constructionList: call(() => getConstructionList(obras)),
       planList: call(() => getPlanList(plantas)),
       groupList: grupos,
       appointmentList: apontamentos,
       occurrenceList: ocorrencias,
+      checklistList: checklists,
     });
 
     yield put(getConstructionListSuccess(constructionList));
@@ -137,6 +145,7 @@ export function* getAllList(): any {
     yield put(getGroupListSuccess(groupList));
     yield put(getAppointmentListSuccess(appointmentList));
     yield put(getOccurrenceListSuccess(occurrenceList));
+    yield put(getChecklistListSuccess(checklistList));
 
     return yield put(allSuccess());
   } catch (error) {
@@ -146,6 +155,7 @@ export function* getAllList(): any {
     yield put(getGroupListFailure());
     yield put(getAppointmentListFailure());
     yield put(getOccurrenceListFailure());
+    yield put(getChecklistListFailure());
 
     return yield put(allFailure());
   }

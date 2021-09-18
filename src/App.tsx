@@ -13,6 +13,7 @@ import * as Sentry from '@sentry/react-native';
 import { store, persistor } from '~/store';
 
 import Routes from '~/routes';
+import colors from './styles/colors';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -31,7 +32,7 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <StatusBar barStyle="light-content" />
+          <StatusBar barStyle="light-content" backgroundColor={colors.gray} />
           <Routes />
         </PersistGate>
       </Provider>
