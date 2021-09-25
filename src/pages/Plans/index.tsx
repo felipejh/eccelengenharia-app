@@ -66,6 +66,7 @@ const Plans: React.FC = () => {
 
   useEffect(() => {
     loadPlans();
+    // console.tron.log(listPlans);
   }, []);
 
   useEffect(() => {

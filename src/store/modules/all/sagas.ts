@@ -80,18 +80,20 @@ function* getConstructionList(obras: Array<Construction>) {
 
 function* getPlanList(plantas: Array<Plan>) {
   const data: Array<Plan> = yield all(
-    plantas.map(async c => ({
-      ...c,
-      name: c.nome,
-      constructionId: c.obraId,
-      type: c.tipo,
-      descType: getConstructionType(c.tipo),
-      active: c.ativo,
-      userCreateId: c.usuarioCreateId,
-      userUpdatedId: c.usuarioUpdateId,
-      img: `${API_URL}${c.url}`,
-      imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
-    })),
+    plantas
+      // .sort((a, b) => a.nome.localeCompare(b.nome))
+      .map(async c => ({
+        ...c,
+        name: c.nome,
+        constructionId: c.obraId,
+        type: c.tipo,
+        descType: getConstructionType(c.tipo),
+        active: c.ativo,
+        userCreateId: c.usuarioCreateId,
+        userUpdatedId: c.usuarioUpdateId,
+        img: `${API_URL}${c.url}`,
+        imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
+      })),
   );
 
   return data;
@@ -101,10 +103,10 @@ export function* getAllList(): any {
   try {
     yield put(getConstructionListAllRequest());
     yield put(getPlanListAllRequest());
-    yield put(getGroupListAllRequest());
-    yield put(getAppointmentListAllRequest());
-    yield put(getOccurrenceListAllRequest());
-    yield put(getChecklistListAllRequest());
+    // yield put(getGroupListAllRequest());
+    // yield put(getAppointmentListAllRequest());
+    // yield put(getOccurrenceListAllRequest());
+    // yield put(getChecklistListAllRequest());
 
     const ws = '/api/v1/all';
 
@@ -142,10 +144,10 @@ export function* getAllList(): any {
 
     yield put(getConstructionListSuccess(constructionList));
     yield put(getPlanListSuccess(planList));
-    yield put(getGroupListSuccess(groupList));
-    yield put(getAppointmentListSuccess(appointmentList));
-    yield put(getOccurrenceListSuccess(occurrenceList));
-    yield put(getChecklistListSuccess(checklistList));
+    // yield put(getGroupListSuccess(groupList));
+    // yield put(getAppointmentListSuccess(appointmentList));
+    // yield put(getOccurrenceListSuccess(occurrenceList));
+    // yield put(getChecklistListSuccess(checklistList));
 
     return yield put(allSuccess());
   } catch (error) {

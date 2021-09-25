@@ -44,6 +44,19 @@ const SignIn: React.FC = () => {
   const { loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    const requestExternalStoragePermissions = async () => {
+      const read = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      );
+      const write = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      return (
+        read === PermissionsAndroid.RESULTS.GRANTED &&
+        write === PermissionsAndroid.RESULTS.GRANTED
+      );
+    };
+
     const requestCameraPermission = async () => {
       try {
         const granted = await PermissionsAndroid.request(
@@ -69,6 +82,7 @@ const SignIn: React.FC = () => {
     };
     if (Platform.OS === 'android') {
       requestCameraPermission();
+      requestExternalStoragePermissions();
     }
   }, []);
 
@@ -80,8 +94,8 @@ const SignIn: React.FC = () => {
 
     dispatch(
       signInRequest({
-        user: 'apple@apple.com',
-        password: 'apple123',
+        user: 'compras@eccelengenharia.com.br',
+        password: 'eccel123',
       }),
     );
   };

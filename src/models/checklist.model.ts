@@ -8,4 +8,22 @@ export interface Checklist {
   gruposapontamentoId: number;
   usuarioCreateId: number;
   usuarioUpdateId: number;
+  answers?: {
+    id: number;
+    situacao: string;
+    dth_resposta: string;
+    createdAt: string;
+    updatedAt: string;
+    checklistId: number;
+    plantaId: number;
+    ocorrenciaId: number | null;
+    usuarioCreateId: number;
+    usuarioUpdateId: number | null;
+    usuarioCreate: {
+      id: number;
+      usuario: string;
+      nome: string;
+    };
+    usuarioUpdate: string | null;
+  };
 }

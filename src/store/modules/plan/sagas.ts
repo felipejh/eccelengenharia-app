@@ -32,18 +32,25 @@ export function* getPlan({
     const data: Array<Plan> = yield all(
       response.data
         .filter((plan: Plan) => plan.obraId === constructionId)
-        .map(async (c: Plan) => ({
-          ...c,
-          name: c.nome,
-          constructionId: c.obraId,
-          type: c.tipo,
-          descType: getConstructionType(c.tipo),
-          active: c.ativo,
-          userCreateId: c.usuarioCreateId,
-          userUpdatedId: c.usuarioUpdateId,
-          img: `${API_URL}${c.url}`,
-          imgSystemPath: await getImgSystemPath(`${API_URL}${c.url}`, c.imagem),
-        })),
+        // .sort((a, b) => a.nome.localeCompare(b.nome))
+        .map(async (c: Plan) => {
+          console.tron.log(c);
+          return {
+            ...c,
+            name: c.nome,
+            constructionId: c.obraId,
+            type: c.tipo,
+            descType: getConstructionType(c.tipo),
+            active: c.ativo,
+            userCreateId: c.usuarioCreateId,
+            userUpdatedId: c.usuarioUpdateId,
+            img: `${API_URL}${c.url}`,
+            imgSystemPath: await getImgSystemPath(
+              `${API_URL}${c.url}`,
+              c.imagem,
+            ),
+          };
+        }),
     );
 
     return yield put(getPlanListSuccess(data));
