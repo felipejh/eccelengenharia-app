@@ -46,7 +46,7 @@ export async function getAllData(): Promise<void> {
     }
 
     const {
-      // grupos,
+      grupos,
       // apontamentos,
       // obras,
       // plantas,
@@ -55,6 +55,10 @@ export async function getAllData(): Promise<void> {
     ResponseAll = response.data;
 
     realm.write(() => {
+      grupos.forEach(group => {
+        realm.create('Groups', group, Realm.UpdateMode.Modified);
+      });
+
       ocorrencias.forEach(o => {
         realm.create('Occurrences', o, Realm.UpdateMode.Modified);
       });

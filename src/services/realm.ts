@@ -1,10 +1,10 @@
 import Realm from 'realm';
 
-import OccurrenceSchema from '~/schemas/OccurrenceSchema';
+import { OccurrenceSchema, GroupsSchema } from '~/schemas';
 
 export default function getRealm(): ProgressPromise {
   return Realm.open({
     schemaVersion: 1,
-    schema: [OccurrenceSchema],
+    schema: [OccurrenceSchema, GroupsSchema],
   });
 }

@@ -2,7 +2,7 @@ const OccurrenceSchema = {
   name: 'Occurrences',
   primaryKey: 'id',
   properties: {
-    id: { type: 'int', indexed: true },
+    id: 'int',
     descricao: 'string?',
     coord_x: 'string',
     coord_y: 'string',

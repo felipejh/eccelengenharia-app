@@ -1,6 +1,6 @@
 ﻿import React, { FC, useState, useEffect } from 'react';
 // import { RefreshControl } from 'react-native';
-import { FlatList, Platform, Text } from 'react-native';
+import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '~/store/modules/rootReducer';
@@ -24,14 +24,13 @@ import {
   TextNameConstruction,
 } from './styles';
 import { getConstructionListRequest } from '~/store/modules/construction/actions';
-import getRealm from '~/services/realm';
 import { Occurrence } from '~/models/occurrences.model';
 
 const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const [oc, setOc] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { listConstruction, loading: loadingConstruction } = useSelector(
     (state: RootState) => state.construction,
@@ -64,18 +63,13 @@ const Dashboard: FC<ConstructionProps> = () => {
 
   useEffect(() => {
     async function loadCache() {
-      await getAllData();
-
-      const realm = await getRealm();
-
       try {
-        const data22 = realm.objects('Occurrences');
-        // setOc(data22);
-        console.tron.log(data22.slice(22, 23));
-        realm.close();
-      } catch (error) {
-        realm.close();
-        console.tron.error(error);
+        setLoading(true);
+
+        await getAllData();
+        setLoading(false);
+      } catch {
+        setLoading(false);
       }
     }
     loadCache();
@@ -145,12 +139,6 @@ const Dashboard: FC<ConstructionProps> = () => {
           <IconInputFilter name="search" size={20} color={iconColor} />
         </ContainerInputFilter>
 
-        {/* <FlatList
-          data={oc}
-          keyExtractor={item => String(item.id)}
-          renderItem={({ item }) => <Text>{item.id}</Text>}
-        /> */}
-
         {/* <LoadingModal
           text="Sincronizando dados..."
           loading={
@@ -161,10 +149,7 @@ const Dashboard: FC<ConstructionProps> = () => {
           }
         /> */}
 
-        <LoadingModal
-          text="Carregando obras..."
-          loading={loadingConstruction}
-        />
+        <LoadingModal text="Sincronizando dados..." loading={loading} />
 
         <List
           data={filteredConstruction}
