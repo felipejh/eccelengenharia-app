@@ -122,7 +122,7 @@ export function* getAllList(): any {
       apontamentos,
       obras,
       plantas,
-      ocorrencias,
+      // ocorrencias,
       checklists,
     }: ResponseDataProps = response.data;
 
@@ -135,7 +135,7 @@ export function* getAllList(): any {
     yield put(getPlanListSuccess(planList));
     yield put(getGroupListSuccess(grupos));
     yield put(getAppointmentListSuccess(apontamentos));
-    yield put(getOccurrenceListSuccess(ocorrencias.slice(0, 2225)));
+    // yield put(getOccurrenceListSuccess(ocorrencias));
     yield put(getChecklistListSuccess(checklists));
 
     return yield put(allSuccess());
@@ -152,4 +152,4 @@ export function* getAllList(): any {
   }
 }
 
-export default all([takeLatest(AllTypes.ALL_REQUEST, getAllList)]);
+// export default all([takeLatest(AllTypes.ALL_REQUEST, getAllList)]);

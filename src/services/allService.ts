@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { Alert } from 'react-native';
 import { Appointment } from '~/models/appointment.model';
 import { Checklist } from '~/models/checklist.model';
 import { Construction } from '~/models/construction.model';
@@ -6,6 +7,7 @@ import { Group } from '~/models/groups.model';
 import { Occurrence } from '~/models/occurrences.model';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
+import getRealm from '~/services/realm';
 
 interface Props {
   apontamentos: Array<Appointment>;
@@ -19,4 +21,49 @@ interface AllService {
   (): Promise<AxiosResponse<Props>>;
 }
 
+interface ResponseAll {
+  grupos: Array<Group>;
+  apontamentos: Array<Appointment>;
+  obras: Array<Construction>;
+  plantas: Array<Plan>;
+  ocorrencias: Array<Occurrence>;
+  checklists: Array<Checklist>;
+}
+
 export const getAll: AllService = async () => api.get('/api/v1/all');
+
+export async function getAllData(): Promise<void> {
+  try {
+    const realm = await getRealm();
+
+    const response = await api.get('/api/v1/all');
+
+    if (response.status !== 200) {
+      Alert.alert(
+        'Ocorreu um erro ao sincronizar os dados para operar em modo offline',
+      );
+      return;
+    }
+
+    const {
+      // grupos,
+      // apontamentos,
+      // obras,
+      // plantas,
+      ocorrencias,
+    }: // checklists,
+    ResponseAll = response.data;
+
+    realm.write(() => {
+      ocorrencias.forEach(o => {
+        realm.create('Occurrences', o, Realm.UpdateMode.Modified);
+      });
+    });
+
+    realm.close();
+  } catch (error) {
+    Alert.alert(
+      'Ocorreu um erro ao sincronizar os dados para operar em modo offline',
+    );
+  }
+}

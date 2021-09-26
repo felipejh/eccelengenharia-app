@@ -1,5 +1,6 @@
 package com.tecnosys.eccelengenharia;
 
+import io.realm.react.RealmReactPackage;
 import com.microsoft.codepush.react.CodePush;
 import android.app.Application;
 import android.content.Context;
@@ -30,6 +31,7 @@ public class MainApplication extends Application implements ReactApplication {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
           new RNFetchBlobPackage();
+          new RealmReactPackage();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           return packages;
