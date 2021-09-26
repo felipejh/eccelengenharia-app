@@ -47,7 +47,7 @@ export async function getAllData(): Promise<void> {
 
     const {
       grupos,
-      // apontamentos,
+      apontamentos,
       // obras,
       // plantas,
       ocorrencias,
@@ -55,19 +55,29 @@ export async function getAllData(): Promise<void> {
     ResponseAll = response.data;
 
     realm.write(() => {
-      grupos.forEach(group => {
-        realm.create('Groups', group, Realm.UpdateMode.Modified);
-      });
+      realm.deleteAll();
 
-      ocorrencias.forEach(o => {
-        realm.create('Occurrences', o, Realm.UpdateMode.Modified);
+      grupos
+        .filter(group => group.ativo === 1)
+        .forEach(group => {
+          realm.create('Groups', group, Realm.UpdateMode.All);
+        });
+
+      apontamentos
+        .filter(appointment => appointment.ativo === 1)
+        .forEach(appointment => {
+          realm.create('Appointments', appointment, Realm.UpdateMode.All);
+        });
+
+      ocorrencias.forEach(occurrence => {
+        realm.create('Occurrences', occurrence, Realm.UpdateMode.All);
       });
     });
 
     realm.close();
   } catch (error) {
     Alert.alert(
-      'Ocorreu um erro ao sincronizar os dados para operar em modo offline',
+      'Ocorreu um erro ao sincronizar os dados para operar em modo offline.',
     );
   }
 }
