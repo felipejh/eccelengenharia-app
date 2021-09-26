@@ -7,7 +7,7 @@ export interface Checklist {
   updatedAt: string;
   gruposapontamentoId: number;
   usuarioCreateId: number;
-  usuarioUpdateId: number;
+  usuarioUpdateId: number | null;
   answers?: {
     id: number;
     situacao: string;

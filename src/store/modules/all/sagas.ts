@@ -81,7 +81,7 @@ function* getConstructionList(obras: Array<Construction>) {
 function* getPlanList(plantas: Array<Plan>) {
   const data: Array<Plan> = yield all(
     plantas
-      // .sort((a, b) => a.nome.localeCompare(b.nome))
+      .sort((a, b) => a.nome.localeCompare(b.nome))
       .map(async c => ({
         ...c,
         name: c.nome,
@@ -103,10 +103,10 @@ export function* getAllList(): any {
   try {
     yield put(getConstructionListAllRequest());
     yield put(getPlanListAllRequest());
-    // yield put(getGroupListAllRequest());
-    // yield put(getAppointmentListAllRequest());
+    yield put(getGroupListAllRequest());
+    yield put(getAppointmentListAllRequest());
     // yield put(getOccurrenceListAllRequest());
-    // yield put(getChecklistListAllRequest());
+    yield put(getChecklistListAllRequest());
 
     const ws = '/api/v1/all';
 
@@ -126,28 +126,17 @@ export function* getAllList(): any {
       checklists,
     }: ResponseDataProps = response.data;
 
-    const {
-      constructionList,
-      planList,
-      groupList,
-      appointmentList,
-      occurrenceList,
-      checklistList,
-    } = yield all({
+    const { constructionList, planList } = yield all({
       constructionList: call(() => getConstructionList(obras)),
       planList: call(() => getPlanList(plantas)),
-      groupList: grupos,
-      appointmentList: apontamentos,
-      occurrenceList: ocorrencias,
-      checklistList: checklists,
     });
 
     yield put(getConstructionListSuccess(constructionList));
     yield put(getPlanListSuccess(planList));
-    // yield put(getGroupListSuccess(groupList));
-    // yield put(getAppointmentListSuccess(appointmentList));
-    // yield put(getOccurrenceListSuccess(occurrenceList));
-    // yield put(getChecklistListSuccess(checklistList));
+    yield put(getGroupListSuccess(grupos));
+    yield put(getAppointmentListSuccess(apontamentos));
+    yield put(getOccurrenceListSuccess(ocorrencias.slice(0, 2225)));
+    yield put(getChecklistListSuccess(checklists));
 
     return yield put(allSuccess());
   } catch (error) {
