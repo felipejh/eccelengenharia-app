@@ -3,6 +3,7 @@ import GroupsSchema from '~/schemas/GroupsSchema';
 import AppointmentsSchema from '~/schemas/AppointmentsSchema';
 import ConstructionSchema from '~/schemas/ConstructionSchema';
 import ChecklistsSchema from '~/schemas/ChecklistsSchema';
+import PlansSchema from '~/schemas/PlansSchema';
 
 export {
   OccurrenceSchema,
@@ -10,4 +11,5 @@ export {
   AppointmentsSchema,
   ConstructionSchema,
   ChecklistsSchema,
+  PlansSchema,
 };

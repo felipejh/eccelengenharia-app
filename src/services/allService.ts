@@ -49,7 +49,7 @@ export async function getAllData(): Promise<void> {
       grupos,
       apontamentos,
       obras,
-      // plantas,
+      plantas,
       ocorrencias,
       checklists,
     }: ResponseAll = response.data;
@@ -78,6 +78,12 @@ export async function getAllData(): Promise<void> {
       ocorrencias.forEach(occurrence => {
         realm.create('Occurrences', occurrence, Realm.UpdateMode.All);
       });
+
+      plantas
+        .filter(plan => plan.ativo === 1)
+        .forEach(plan => {
+          realm.create('Plans', plan, Realm.UpdateMode.All);
+        });
 
       checklists
         .filter(checklist => checklist.ativo === 1)

@@ -6,6 +6,7 @@ import {
   AppointmentsSchema,
   ConstructionSchema,
   ChecklistsSchema,
+  PlansSchema,
 } from '~/schemas';
 
 export default function getRealm(): ProgressPromise {
@@ -17,6 +18,7 @@ export default function getRealm(): ProgressPromise {
       AppointmentsSchema,
       ConstructionSchema,
       ChecklistsSchema,
+      PlansSchema,
     ],
   });
 }
