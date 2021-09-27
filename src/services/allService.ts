@@ -48,7 +48,7 @@ export async function getAllData(): Promise<void> {
     const {
       grupos,
       apontamentos,
-      // obras,
+      obras,
       // plantas,
       ocorrencias,
     }: // checklists,
@@ -56,6 +56,12 @@ export async function getAllData(): Promise<void> {
 
     realm.write(() => {
       realm.deleteAll();
+
+      obras
+        .filter(construction => construction.ativo === 1)
+        .forEach(construction => {
+          realm.create('Construction', construction, Realm.UpdateMode.All);
+        });
 
       grupos
         .filter(group => group.ativo === 1)
