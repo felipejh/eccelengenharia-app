@@ -51,8 +51,8 @@ export async function getAllData(): Promise<void> {
       obras,
       // plantas,
       ocorrencias,
-    }: // checklists,
-    ResponseAll = response.data;
+      checklists,
+    }: ResponseAll = response.data;
 
     realm.write(() => {
       realm.deleteAll();
@@ -78,6 +78,12 @@ export async function getAllData(): Promise<void> {
       ocorrencias.forEach(occurrence => {
         realm.create('Occurrences', occurrence, Realm.UpdateMode.All);
       });
+
+      checklists
+        .filter(checklist => checklist.ativo === 1)
+        .forEach(checklist => {
+          realm.create('Checklists', checklist, Realm.UpdateMode.All);
+        });
     });
 
     realm.close();
