@@ -34,7 +34,7 @@ export function* getPlan({
         .filter((plan: Plan) => plan.obraId === constructionId)
         // .sort((a, b) => a.nome.localeCompare(b.nome))
         .map(async (c: Plan) => {
-          console.tron.log(c);
+          // console.tron.log(c);
           return {
             ...c,
             name: c.nome,

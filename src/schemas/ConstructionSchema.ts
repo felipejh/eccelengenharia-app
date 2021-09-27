@@ -13,6 +13,8 @@ const ConstructionSchema = {
     updatedAt: 'string?',
     usuarioCreateId: 'int?',
     usuarioUpdateId: 'int?',
+    descType: 'string',
+    imgSystemPath: 'string?',
   },
 };
 

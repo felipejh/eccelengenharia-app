@@ -74,7 +74,7 @@ const Plans: React.FC = () => {
       plan => plan.constructionId === constructionId,
     );
 
-    console.tron.log(listPlansConstruction);
+    // console.tron.log(listPlansConstruction);
     setFilteredPlans(listPlansConstruction);
   }, [listPlans]);
 

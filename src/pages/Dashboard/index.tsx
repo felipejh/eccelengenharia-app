@@ -25,41 +25,29 @@ import {
 } from './styles';
 import { getConstructionListRequest } from '~/store/modules/construction/actions';
 import { Occurrence } from '~/models/occurrences.model';
+import getRealm from '~/services/realm';
 
 const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState<boolean>(false);
-
-  const { listConstruction, loading: loadingConstruction } = useSelector(
-    (state: RootState) => state.construction,
-  );
-
-  const { listPlans, loading: loadingPlans } = useSelector(
-    (state: RootState) => state.plan,
-  );
-
-  const { listGroups, loading: loadingGroups } = useSelector(
-    (state: RootState) => state.groups,
-  );
-
-  const { listOccurrences, loading: loadingOccurrences } = useSelector(
-    (state: RootState) => state.occurrences,
+  const [listConstruction, setListConstruction] = useState<Array<Construction>>(
+    [],
   );
 
   const [filteredConstruction, setFilteredConstructions] =
     useState<Array<Construction>>(listConstruction);
 
-  async function loadConstructionList() {
-    if (await isConnected()) {
-      dispatch(getConstructionListRequest());
-    }
-  }
+  // async function loadConstructionList() {
+  //   if (await isConnected()) {
+  //     dispatch(getConstructionListRequest());
+  //   }
+  // }
 
-  useEffect(() => {
-    loadConstructionList();
-  }, []);
+  // useEffect(() => {
+  //   loadConstructionList();
+  // }, []);
 
   useEffect(() => {
     async function loadCache() {
@@ -67,6 +55,18 @@ const Dashboard: FC<ConstructionProps> = () => {
         setLoading(true);
 
         await getAllData();
+
+        const realm = await getRealm();
+
+        const data = realm
+          .objects('Construction')
+          .sorted('percentualConclusao', true);
+
+        setListConstruction(JSON.parse(JSON.stringify(data)));
+        setFilteredConstructions(JSON.parse(JSON.stringify(data)));
+        console.tron.log(JSON.parse(JSON.stringify(data)));
+        realm.close();
+
         setLoading(false);
       } catch {
         setLoading(false);
@@ -98,7 +98,7 @@ const Dashboard: FC<ConstructionProps> = () => {
   const handleFilter = (constructionName: string) => {
     if (constructionName) {
       const filtered = listConstruction.filter(c =>
-        c.name.toLowerCase().includes(constructionName.toLowerCase()),
+        c.nome.toLowerCase().includes(constructionName.toLowerCase()),
       );
       setFilteredConstructions(filtered);
     } else {

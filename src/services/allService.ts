@@ -8,6 +8,7 @@ import { Occurrence } from '~/models/occurrences.model';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
 import getRealm from '~/services/realm';
+import { getConstructionModelAdapter } from './constructionService';
 
 interface Props {
   apontamentos: Array<Appointment>;
@@ -54,10 +55,13 @@ export async function getAllData(): Promise<void> {
       checklists,
     }: ResponseAll = response.data;
 
+    const constructionList = await getConstructionModelAdapter(obras);
+    // console.tron.log('all', constructionList);
+
     realm.write(() => {
       realm.deleteAll();
 
-      obras
+      constructionList
         .filter(construction => construction.ativo === 1)
         .forEach(construction => {
           realm.create('Construction', construction, Realm.UpdateMode.All);
@@ -94,6 +98,7 @@ export async function getAllData(): Promise<void> {
 
     realm.close();
   } catch (error) {
+    console.tron.error(error);
     Alert.alert(
       'Ocorreu um erro ao sincronizar os dados para operar em modo offline.',
     );

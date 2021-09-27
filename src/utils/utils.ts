@@ -1,6 +1,8 @@
 ﻿import NetInfo from '@react-native-community/netinfo';
 import { Platform } from 'react-native';
+import { API_URL } from 'react-native-dotenv';
 import RNFetchBlob from 'rn-fetch-blob';
+import { Construction } from '~/models/construction.model';
 
 export async function isConnected(): Promise<boolean> {
   const connection = await NetInfo.fetch().then(state => state.isConnected);
@@ -28,4 +30,22 @@ export async function getImgSystemPath(
   } catch {
     return '';
   }
+}
+
+export async function getObjectModelWithImgPath<T extends Construction>(
+  list: Array<T>,
+): Promise<Array<T>> {
+  const data = await Promise.all(
+    list.map(
+      async (item): Promise<T> => ({
+        ...item,
+        imgSystemPath: await getImgSystemPath(
+          `${API_URL}${item.url}`,
+          item.imagem,
+        ),
+      }),
+    ),
+  );
+  // console.tron.log('utils', data);
+  return data;
 }
