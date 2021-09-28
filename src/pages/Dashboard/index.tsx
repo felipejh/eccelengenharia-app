@@ -1,14 +1,16 @@
 ﻿import React, { FC, useState, useEffect } from 'react';
-// import { RefreshControl } from 'react-native';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
+import { AxiosResponse } from 'axios';
+import { differenceInDays } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
 import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
 import colors from '~/styles/colors';
 import { isConnected } from '~/utils/utils';
 import { getAllData } from '~/services/allService';
+import { setLastSyncDate } from '~/store/modules/storage/actions';
 
 import {
   Container,
@@ -23,13 +25,15 @@ import {
   TextTypeConstruction,
   TextNameConstruction,
 } from './styles';
-import { getConstructionListRequest } from '~/store/modules/construction/actions';
-import { Occurrence } from '~/models/occurrences.model';
 import getRealm from '~/services/realm';
+import api from '~/services/api';
+import { getConstructionModelAdapter } from '~/services/constructionService';
 
 const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const { lastSyncDate } = useSelector((state: RootState) => state.storage);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [listConstruction, setListConstruction] = useState<Array<Construction>>(
@@ -39,19 +43,60 @@ const Dashboard: FC<ConstructionProps> = () => {
   const [filteredConstruction, setFilteredConstructions] =
     useState<Array<Construction>>(listConstruction);
 
-  // async function loadConstructionList() {
-  //   if (await isConnected()) {
-  //     dispatch(getConstructionListRequest());
-  //   }
-  // }
+  async function loadConstructionList() {
+    if (await isConnected()) {
+      try {
+        const response: AxiosResponse<Array<Construction>> = await api.get(
+          '/api/v1/obras',
+        );
 
-  // useEffect(() => {
-  //   loadConstructionList();
-  // }, []);
+        const constructionList = await getConstructionModelAdapter(
+          response.data,
+        );
+
+        const realm = await getRealm();
+
+        realm.write(() => {
+          constructionList
+            .filter(construction => construction.ativo === 1)
+            .forEach(construction => {
+              realm.create(
+                'Construction',
+                construction,
+                Realm.UpdateMode.Modified,
+              );
+            });
+
+          const data = realm
+            .objects('Construction')
+            .sorted('percentualConclusao', true);
+
+          setListConstruction(JSON.parse(JSON.stringify(data)));
+          setFilteredConstructions(JSON.parse(JSON.stringify(data)));
+        });
+
+        realm.close();
+      } catch {
+        Alert.alert('Atenção', 'Ocorreu um erro ao buscar as obras');
+      }
+    }
+  }
 
   useEffect(() => {
     async function loadCache() {
       try {
+        if (lastSyncDate && differenceInDays(new Date(), lastSyncDate) < 1) {
+          // console.tron.log('Houve sincronização TOTAL hoje');
+          // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
+          // console.tron.log(
+          //   `diff: ${differenceInDays(new Date(), lastSyncDate)}`,
+          // );
+          await loadConstructionList();
+          return;
+        }
+        // console.tron.log('Não houve sincronização TOTAL hoje');
+        // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
+
         setLoading(true);
 
         await getAllData();
@@ -64,16 +109,17 @@ const Dashboard: FC<ConstructionProps> = () => {
 
         setListConstruction(JSON.parse(JSON.stringify(data)));
         setFilteredConstructions(JSON.parse(JSON.stringify(data)));
-        console.tron.log(JSON.parse(JSON.stringify(data)));
+
         realm.close();
 
         setLoading(false);
+        dispatch(setLastSyncDate(new Date()));
       } catch {
         setLoading(false);
       }
     }
     loadCache();
-  }, []);
+  }, [lastSyncDate]);
 
   useEffect(() => {
     setFilteredConstructions(listConstruction);
@@ -138,16 +184,6 @@ const Dashboard: FC<ConstructionProps> = () => {
           />
           <IconInputFilter name="search" size={20} color={iconColor} />
         </ContainerInputFilter>
-
-        {/* <LoadingModal
-          text="Sincronizando dados..."
-          loading={
-            (listConstruction.length <= 0 && loadingConstruction) ||
-            (listPlans.length <= 0 && loadingPlans) ||
-            (listGroups.length <= 0 && loadingGroups) ||
-            (listOccurrences.length <= 0 && loadingOccurrences)
-          }
-        /> */}
 
         <LoadingModal text="Sincronizando dados..." loading={loading} />
 

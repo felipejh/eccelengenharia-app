@@ -8,6 +8,7 @@ import groups from '~/store/modules/groups/reducer';
 import appointments from '~/store/modules/appointments/reducer';
 import occurrences from '~/store/modules/occurrences/reducer';
 import checklists from '~/store/modules/checklists/reducer';
+import storage from '~/store/modules/storage/reducer';
 
 export const rootReducer = combineReducers({
   all,
@@ -18,6 +19,7 @@ export const rootReducer = combineReducers({
   appointments,
   occurrences,
   checklists,
+  storage,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

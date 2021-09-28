@@ -46,6 +46,6 @@ export async function getObjectModelWithImgPath<T extends Construction>(
       }),
     ),
   );
-  // console.tron.log('utils', data);
+
   return data;
 }
