@@ -50,7 +50,6 @@ const Dashboard: FC<ConstructionProps> = () => {
           '/api/v1/obras',
         );
 
-        console.tron.log('CHAMADA dash');
         const constructionList = await getConstructionModelAdapter(
           response.data,
         );
