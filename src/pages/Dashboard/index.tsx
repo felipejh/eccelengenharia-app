@@ -8,7 +8,7 @@ import { RootState } from '~/store/modules/rootReducer';
 import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
 import colors from '~/styles/colors';
-import { isConnected } from '~/utils/utils';
+import { isConnected, isExistsEccelFolder } from '~/utils/utils';
 import { getAllData } from '~/services/allService';
 import { setLastSyncDate } from '~/store/modules/storage/actions';
 
@@ -50,6 +50,7 @@ const Dashboard: FC<ConstructionProps> = () => {
           '/api/v1/obras',
         );
 
+        console.tron.log('CHAMADA dash');
         const constructionList = await getConstructionModelAdapter(
           response.data,
         );
@@ -84,10 +85,13 @@ const Dashboard: FC<ConstructionProps> = () => {
 
   useEffect(() => {
     async function loadCache() {
+      const isExistsCache = await isExistsEccelFolder();
+
       try {
         if (
-          lastSyncDate &&
-          differenceInDays(new Date(), parseISO(lastSyncDate)) < 1
+          (lastSyncDate &&
+            differenceInDays(new Date(), parseISO(lastSyncDate)) < 1) ||
+          !isExistsCache
         ) {
           // console.tron.log('Houve sincronização TOTAL hoje');
           // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
@@ -101,7 +105,7 @@ const Dashboard: FC<ConstructionProps> = () => {
         // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
 
         setLoading(true);
-
+        console.tron.log('chamada  load dash');
         await getAllData();
 
         const realm = await getRealm();

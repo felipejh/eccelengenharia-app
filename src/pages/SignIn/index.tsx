@@ -28,6 +28,7 @@ import bgLogin from '~/assets/bg_login.png';
 import logo from '~/assets/logo_inicial.png';
 import { RootState } from '~/store/modules/rootReducer';
 import colors from '~/styles/colors';
+import { deleteImgFolder } from '~/utils/utils';
 
 interface SignInFormData {
   user: string;
@@ -44,53 +45,67 @@ const SignIn: React.FC = () => {
   const { loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    const requestExternalStoragePermissions = async () => {
-      const read = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      );
-      const write = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      );
-      return (
-        read === PermissionsAndroid.RESULTS.GRANTED &&
-        write === PermissionsAndroid.RESULTS.GRANTED
-      );
-    };
-
-    const requestCameraPermission = async () => {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Cool Photo App Camera Permission',
-            message:
-              'Cool Photo App needs access to your camera ' +
-              'so you can take awesome pictures.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
+    async function requestPermissions() {
+      const requestExternalStoragePermissions = async () => {
+        const read = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        const write = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        );
+
+        if (
+          !(
+            read === PermissionsAndroid.RESULTS.GRANTED &&
+            write === PermissionsAndroid.RESULTS.GRANTED
+          )
+        ) {
           Alert.alert(
-            'Este aplicativo não funcionará offline sem permissão da câmera',
+            'Este aplicativo não funcionará offline sem permissão para acessar arquivos',
           );
         }
-      } catch (err) {
-        Alert.alert(`Ocorreu um erro ao solicitar permissão de câmera: ${err}`);
+      };
+
+      const requestCameraPermission = async () => {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            {
+              title: 'Cool Photo App Camera Permission',
+              message:
+                'Cool Photo App needs access to your camera ' +
+                'so you can take awesome pictures.',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            Alert.alert(
+              'Este aplicativo não funcionará offline sem permissão da câmera',
+            );
+          }
+        } catch (err) {
+          Alert.alert(
+            `Ocorreu um erro ao solicitar permissão de câmera: ${err}`,
+          );
+        }
+      };
+      if (Platform.OS === 'android') {
+        await requestCameraPermission();
+        await requestExternalStoragePermissions();
       }
-    };
-    if (Platform.OS === 'android') {
-      requestCameraPermission();
-      requestExternalStoragePermissions();
     }
+
+    requestPermissions();
   }, []);
 
-  const handleSignIn = ({ user, password }: SignInFormData) => {
+  const handleSignIn = async ({ user, password }: SignInFormData) => {
     // if (!user || !password) {
     //   Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
     //   return;
     // }
+    // await deleteImgFolder();
 
     dispatch(
       signInRequest({

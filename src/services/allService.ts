@@ -56,6 +56,7 @@ export async function getAllData(): Promise<void> {
       checklists,
     }: ResponseAll = response.data;
 
+    console.tron.log('CHAMADA ALL');
     const constructionList = await getConstructionModelAdapter(obras);
     const plansList = await getPlansModelAdapter(plantas);
 

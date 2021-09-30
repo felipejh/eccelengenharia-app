@@ -23,12 +23,11 @@ import {
   SyncButtonText,
   TextLastSyncDate,
 } from './styles';
+import { deleteImgFolder } from '~/utils/utils';
 
 const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const dispatch = useDispatch();
   const { navigation } = props;
-
-  // const [syncDate, setSyncDate] = useState<Date | string>('');
 
   const { displayName } = useSelector((state: RootState) => state.auth);
   const { lastSyncDate } = useSelector((state: RootState) => state.storage);
@@ -50,7 +49,10 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       },
       {
         text: 'Sim',
-        onPress: () => dispatch(signOut()),
+        onPress: async () => {
+          await deleteImgFolder();
+          dispatch(signOut());
+        },
       },
     ]);
   };

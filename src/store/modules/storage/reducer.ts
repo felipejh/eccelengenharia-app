@@ -1,5 +1,4 @@
 import produce from 'immer';
-import { AuthActionProps, AuthTypes } from '~/store/types/auth.types';
 import {
   StorageActionProps,
   StorageActionTypes,
@@ -15,16 +14,12 @@ const INITIAL_STATE: StateProps = {
 
 export default function storage(
   state = INITIAL_STATE,
-  action: StorageActionProps | AuthActionProps,
+  action: StorageActionProps,
 ): StateProps {
   return produce(state, draft => {
     switch (action.type) {
       case StorageActionTypes.SET_LAST_SYNC_DATE: {
         draft.lastSyncDate = action.payload;
-        break;
-      }
-      case AuthTypes.SIGN_OUT: {
-        draft.lastSyncDate = undefined;
         break;
       }
       default:
