@@ -13,6 +13,8 @@ const PlansSchema = {
     obraId: 'int',
     usuarioCreateId: 'int?',
     usuarioUpdateId: 'int?',
+    descType: 'string',
+    imgSystemPath: 'string?',
   },
 };
 

@@ -6,7 +6,7 @@ import {
 } from '~/store/types/storage.types';
 
 type StateProps = {
-  lastSyncDate: Date | undefined;
+  lastSyncDate: string | undefined;
 };
 
 const INITIAL_STATE: StateProps = {

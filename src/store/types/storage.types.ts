@@ -4,7 +4,7 @@ export enum StorageActionTypes {
 
 export interface SetLastSyncDateAction {
   type: StorageActionTypes.SET_LAST_SYNC_DATE;
-  payload: Date | undefined;
+  payload: string | undefined;
 }
 
 export type StorageActionProps = SetLastSyncDateAction;

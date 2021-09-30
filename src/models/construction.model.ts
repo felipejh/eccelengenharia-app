@@ -29,15 +29,9 @@ export interface Construction {
   createdAt: string;
   updatedAt: string;
   img: string;
-  type: number;
   descType: string;
-  name: string;
-  completionPercentage: string;
-  active: number;
   solvedOccurrences: number;
   pendingOccurrences: number;
-  userCreatedId: number;
-  userUpdatedId: number;
   imagem: string;
   imgSystemPath?: string;
 }

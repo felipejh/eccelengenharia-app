@@ -49,3 +49,7 @@ export async function getObjectModelWithImgPath<T extends Construction>(
 
   return data;
 }
+
+export const normalizeRealmData = <T>(data: Realm.Results<Realm.Object>): T => {
+  return JSON.parse(JSON.stringify(data));
+};

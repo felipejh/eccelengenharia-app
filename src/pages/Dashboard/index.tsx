@@ -3,7 +3,7 @@ import { Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AxiosResponse } from 'axios';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, format, parseISO } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
 import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
@@ -85,7 +85,10 @@ const Dashboard: FC<ConstructionProps> = () => {
   useEffect(() => {
     async function loadCache() {
       try {
-        if (lastSyncDate && differenceInDays(new Date(), lastSyncDate) < 1) {
+        if (
+          lastSyncDate &&
+          differenceInDays(new Date(), parseISO(lastSyncDate)) < 1
+        ) {
           // console.tron.log('Houve sincronização TOTAL hoje');
           // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
           // console.tron.log(
@@ -113,7 +116,9 @@ const Dashboard: FC<ConstructionProps> = () => {
         realm.close();
 
         setLoading(false);
-        dispatch(setLastSyncDate(new Date()));
+        dispatch(
+          setLastSyncDate(format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX")),
+        );
       } catch {
         setLoading(false);
       }
@@ -155,18 +160,18 @@ const Dashboard: FC<ConstructionProps> = () => {
   const handleNavigateToPlans = ({
     id,
     descType,
-    name,
+    nome,
     imgSystemPath,
-    completionPercentage,
+    percentualConclusao,
     solvedOccurrences,
     pendingOccurrences,
   }: Construction) => {
     navigation.navigate('Plans', {
       id,
       descType,
-      name,
+      nome,
       imgSystemPath,
-      completionPercentage,
+      percentualConclusao,
       solvedOccurrences,
       pendingOccurrences,
     });

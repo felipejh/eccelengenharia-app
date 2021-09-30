@@ -3,6 +3,7 @@ import { API_URL } from 'react-native-dotenv';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
 import getConstructionType from '~/utils/getConstructionType';
+import { getImgSystemPath } from '~/utils/utils';
 
 interface GetPlansListProps {
   constructionId: number;
@@ -31,3 +32,22 @@ export const getPlansList: PlansListService = async ({ constructionId }) => {
 
   return newPlans;
 };
+
+export async function getPlansModelAdapter(
+  plansList: Array<Plan>,
+): Promise<Array<Plan>> {
+  const data = await Promise.all(
+    plansList.map(
+      async (plan): Promise<Plan> => ({
+        ...plan,
+        descType: getConstructionType(plan.tipo),
+        imgSystemPath: await getImgSystemPath(
+          `${API_URL}${plan.url}`,
+          plan.imagem,
+        ),
+      }),
+    ),
+  );
+
+  return data;
+}

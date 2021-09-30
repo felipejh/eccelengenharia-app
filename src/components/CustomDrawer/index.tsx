@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Alert } from 'react-native';
 
 import {
@@ -8,7 +8,7 @@ import {
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,19 +28,18 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const dispatch = useDispatch();
   const { navigation } = props;
 
-  const [syncDate, setSyncDate] = useState<Date | string>('');
+  // const [syncDate, setSyncDate] = useState<Date | string>('');
 
   const { displayName } = useSelector((state: RootState) => state.auth);
   const { lastSyncDate } = useSelector((state: RootState) => state.storage);
 
-  useEffect(() => {
+  const syncDate = useMemo(() => {
     if (lastSyncDate) {
-      const dateFormatted = format(lastSyncDate, 'dd/MM/yyyy HH:mm:ss', {
+      return format(parseISO(lastSyncDate), 'dd/MM/yyyy HH:mm:ss', {
         locale: ptBR,
       });
-
-      setSyncDate(dateFormatted);
     }
+    return '';
   }, [lastSyncDate]);
 
   const handleSignOut = () => {

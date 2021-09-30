@@ -2,7 +2,7 @@
 import { Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
-import { useDispatch, useSelector } from 'react-redux';
+import { AxiosResponse } from 'axios';
 import { Plan, PlansScreenRouteProp } from '~/models/plans.model';
 
 import InputFilter from '~/components/InputFilter';
@@ -36,45 +36,72 @@ import {
   TextTypePlan,
   TextNamePlan,
 } from './styles';
-import { isConnected } from '~/utils/utils';
-import { getPlanListRequest } from '~/store/modules/plan/actions';
-import { RootState } from '~/store/modules/rootReducer';
-import LoadingModal from '~/components/LoadingModal';
+import { isConnected, normalizeRealmData } from '~/utils/utils';
+import getRealm from '~/services/realm';
+import api from '~/services/api';
+import { getPlansModelAdapter } from '~/services/plansService';
 
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
   const navigation = useNavigation();
-  const dispatch = useDispatch();
 
   const {
     id: constructionId,
     imgSystemPath,
-    completionPercentage,
+    percentualConclusao,
     solvedOccurrences = 0,
     pendingOccurrences = 0,
   } = route.params;
 
+  const [listPlans, setListPlans] = useState<Array<Plan>>([]);
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
 
-  const { listPlans, loading } = useSelector((state: RootState) => state.plan);
-
   async function loadPlans() {
+    const realm = await getRealm();
+
+    const data = realm
+      .objects('Plans')
+      .filtered(`obraId = ${constructionId}`)
+      .sorted('nome');
+
+    const dataNormalized = normalizeRealmData<Array<Plan>>(data);
+
+    setListPlans(dataNormalized);
+    setFilteredPlans(dataNormalized);
+
     if (await isConnected()) {
-      dispatch(getPlanListRequest(constructionId));
+      const response: AxiosResponse<Array<Plan>> = await api.get(
+        '/api/v1/plantas',
+      );
+
+      const apiPlans = response.data.filter(
+        plan => plan.obraId === constructionId && plan.ativo === 1,
+      );
+
+      const newApiPlans = await getPlansModelAdapter(apiPlans);
+
+      realm.write(() => {
+        newApiPlans.forEach(plan => {
+          realm.create('Plans', plan, Realm.UpdateMode.All);
+        });
+      });
+
+      setListPlans(newApiPlans);
+      setFilteredPlans(newApiPlans);
     }
+
+    realm.close();
   }
 
   useEffect(() => {
     loadPlans();
-    // console.tron.log(listPlans);
   }, []);
 
   useEffect(() => {
     const listPlansConstruction = listPlans.filter(
-      plan => plan.constructionId === constructionId,
+      plan => plan.obraId === constructionId,
     );
 
-    // console.tron.log(listPlansConstruction);
     setFilteredPlans(listPlansConstruction);
   }, [listPlans]);
 
@@ -111,7 +138,7 @@ const Plans: React.FC = () => {
             <TextProgress>Conclusão da obra</TextProgress>
             <ContainerProgressAndLabel>
               <Progress.Bar
-                progress={Number(completionPercentage) / 100}
+                progress={Number(percentualConclusao) / 100}
                 width={200}
                 height={10}
                 color={colors.green}
@@ -119,13 +146,11 @@ const Plans: React.FC = () => {
                 unfilledColor={colors.black_strong}
               />
               <ValueProgress>
-                {Number(completionPercentage).toFixed()} %
+                {Number(percentualConclusao).toFixed()} %
               </ValueProgress>
             </ContainerProgressAndLabel>
           </ContainerProgress>
         </ContainerImgProgress>
-
-        <LoadingModal text="Carregando plantas..." loading={loading} />
 
         <ContainerOccurrences>
           <ContainerLabelOccurrences>

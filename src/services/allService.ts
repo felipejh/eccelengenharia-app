@@ -9,6 +9,7 @@ import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
 import getRealm from '~/services/realm';
 import { getConstructionModelAdapter } from './constructionService';
+import { getPlansModelAdapter } from './plansService';
 
 interface Props {
   apontamentos: Array<Appointment>;
@@ -56,7 +57,7 @@ export async function getAllData(): Promise<void> {
     }: ResponseAll = response.data;
 
     const constructionList = await getConstructionModelAdapter(obras);
-    // console.tron.log('all', constructionList);
+    const plansList = await getPlansModelAdapter(plantas);
 
     realm.write(() => {
       realm.deleteAll();
@@ -83,7 +84,7 @@ export async function getAllData(): Promise<void> {
         realm.create('Occurrences', occurrence, Realm.UpdateMode.All);
       });
 
-      plantas
+      plansList
         .filter(plan => plan.ativo === 1)
         .forEach(plan => {
           realm.create('Plans', plan, Realm.UpdateMode.All);
