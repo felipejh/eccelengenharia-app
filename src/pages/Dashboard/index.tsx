@@ -89,9 +89,9 @@ const Dashboard: FC<ConstructionProps> = () => {
 
       try {
         if (
-          (lastSyncDate &&
-            differenceInDays(new Date(), parseISO(lastSyncDate)) < 1) ||
-          !isExistsCache
+          lastSyncDate &&
+          differenceInDays(new Date(), parseISO(lastSyncDate)) < 1 &&
+          isExistsCache
         ) {
           // console.tron.log('Houve sincronização TOTAL hoje');
           // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
