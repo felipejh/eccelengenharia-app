@@ -56,7 +56,6 @@ export async function getAllData(): Promise<void> {
       checklists,
     }: ResponseAll = response.data;
 
-    console.tron.log('CHAMADA ALL');
     const constructionList = await getConstructionModelAdapter(obras);
     const plansList = await getPlansModelAdapter(plantas);
 
@@ -100,7 +99,6 @@ export async function getAllData(): Promise<void> {
 
     realm.close();
   } catch (error) {
-    console.tron.error(error);
     Alert.alert(
       'Ocorreu um erro ao sincronizar os dados para operar em modo offline.',
     );

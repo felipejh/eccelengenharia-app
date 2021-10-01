@@ -104,7 +104,7 @@ const Dashboard: FC<ConstructionProps> = () => {
         // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
 
         setLoading(true);
-        console.tron.log('chamada  load dash');
+
         await getAllData();
 
         const realm = await getRealm();
