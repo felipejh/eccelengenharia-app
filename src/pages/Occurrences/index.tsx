@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { View, Dimensions, Image, Alert } from 'react-native';
+import { View, Dimensions, Image, Alert, Platform } from 'react-native';
 
 import { useSelector } from 'react-redux';
 
@@ -58,7 +58,7 @@ export interface ExistsMarkers {
 
 const Occurrences: React.FC = () => {
   const route = useRoute<OccurrencesScreenRouteProp>();
-  const { constructionId, id: planId, img } = route.params;
+  const { constructionId, id: planId, imgSystemPath } = route.params;
 
   const { userId } = useSelector((state: RootState) => state.auth);
 
@@ -102,7 +102,7 @@ const Occurrences: React.FC = () => {
     Array<NormalizedMarker> | undefined
   >([]);
 
-  Image.getSize(img, (widthImg, heightImg) => {
+  Image.getSize(imgSystemPath || '', (widthImg, heightImg) => {
     setWidth(widthImg);
     setHeight(heightImg);
   });
@@ -337,7 +337,12 @@ const Occurrences: React.FC = () => {
         <>
           <Image
             style={{ width: imageWidth, height: imageHeight }}
-            source={{ uri: img }}
+            source={{
+              uri:
+                Platform.OS === 'android'
+                  ? `file://${imgSystemPath}`
+                  : `${imgSystemPath}`,
+            }}
           />
           {topNewMarker && leftNewMarker && isNewMarker ? (
             <Marker
