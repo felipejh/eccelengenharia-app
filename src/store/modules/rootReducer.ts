@@ -1,11 +1,12 @@
 ﻿import { combineReducers } from 'redux';
 
 import auth from '~/store/modules/auth/reducer';
-import construction from '~/store/modules/construction/reducer';
+
+import storage from '~/store/modules/storage/reducer';
 
 export const rootReducer = combineReducers({
   auth,
-  construction,
+  storage,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

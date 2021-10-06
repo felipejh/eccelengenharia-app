@@ -1,12 +1,16 @@
 ﻿import React, { FC, useState, useEffect } from 'react';
-// import { RefreshControl } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
+import { AxiosResponse } from 'axios';
+import { differenceInDays, format, parseISO } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
 import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
 import colors from '~/styles/colors';
-import { isConnected } from '~/utils/utils';
+import { isConnected, isExistsEccelFolder } from '~/utils/utils';
+import { getAllData } from '~/services/allService';
+import { setLastSyncDate } from '~/store/modules/storage/actions';
 
 import {
   Container,
@@ -21,14 +25,19 @@ import {
   TextTypeConstruction,
   TextNameConstruction,
 } from './styles';
-import { getConstructionListRequest } from '~/store/modules/construction/actions';
+import getRealm from '~/services/realm';
+import api from '~/services/api';
+import { getConstructionModelAdapter } from '~/services/constructionService';
 
 const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { listConstruction, loading } = useSelector(
-    (state: RootState) => state.construction,
+  const { lastSyncDate } = useSelector((state: RootState) => state.storage);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [listConstruction, setListConstruction] = useState<Array<Construction>>(
+    [],
   );
 
   const [filteredConstruction, setFilteredConstructions] =
@@ -36,13 +45,91 @@ const Dashboard: FC<ConstructionProps> = () => {
 
   async function loadConstructionList() {
     if (await isConnected()) {
-      dispatch(getConstructionListRequest());
+      try {
+        const response: AxiosResponse<Array<Construction>> = await api.get(
+          '/api/v1/obras',
+        );
+
+        const constructionList = await getConstructionModelAdapter(
+          response.data,
+        );
+
+        const realm = await getRealm();
+
+        realm.write(() => {
+          constructionList
+            .filter(construction => construction.ativo === 1)
+            .forEach(construction => {
+              realm.create(
+                'Construction',
+                construction,
+                Realm.UpdateMode.Modified,
+              );
+            });
+
+          const data = realm
+            .objects('Construction')
+            .sorted('percentualConclusao', true);
+
+          setListConstruction(JSON.parse(JSON.stringify(data)));
+          setFilteredConstructions(JSON.parse(JSON.stringify(data)));
+        });
+
+        realm.close();
+      } catch {
+        Alert.alert('Atenção', 'Ocorreu um erro ao buscar as obras');
+      }
     }
   }
 
   useEffect(() => {
-    loadConstructionList();
-  }, []);
+    async function loadCache() {
+      const isExistsCache = await isExistsEccelFolder();
+
+      try {
+        if (
+          lastSyncDate &&
+          differenceInDays(new Date(), parseISO(lastSyncDate)) < 1 &&
+          isExistsCache
+        ) {
+          // console.tron.log('Houve sincronização TOTAL hoje');
+          // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
+          // console.tron.log(
+          //   `diff: ${differenceInDays(new Date(), lastSyncDate)}`,
+          // );
+          await loadConstructionList();
+          return;
+        }
+        // console.tron.log('Não houve sincronização TOTAL hoje');
+        // console.tron.log(`lastSyncDate: ${lastSyncDate}`);
+
+        setLoading(true);
+
+        await getAllData();
+
+        const realm = await getRealm();
+
+        const data = realm
+          .objects('Construction')
+          .sorted('percentualConclusao', true);
+
+        setListConstruction(JSON.parse(JSON.stringify(data)));
+        setFilteredConstructions(JSON.parse(JSON.stringify(data)));
+
+        realm.close();
+
+        setLoading(false);
+        dispatch(
+          setLastSyncDate(format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX")),
+        );
+      } catch {
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCache();
+  }, [lastSyncDate]);
 
   useEffect(() => {
     setFilteredConstructions(listConstruction);
@@ -67,11 +154,10 @@ const Dashboard: FC<ConstructionProps> = () => {
   const handleFilter = (constructionName: string) => {
     if (constructionName) {
       const filtered = listConstruction.filter(c =>
-        c.name.toLowerCase().includes(constructionName.toLowerCase()),
+        c.nome.toLowerCase().includes(constructionName.toLowerCase()),
       );
       setFilteredConstructions(filtered);
     } else {
-      console.tron.log(listConstruction);
       setFilteredConstructions(listConstruction);
     }
   };
@@ -79,18 +165,18 @@ const Dashboard: FC<ConstructionProps> = () => {
   const handleNavigateToPlans = ({
     id,
     descType,
-    name,
-    img,
-    completionPercentage,
+    nome,
+    imgSystemPath,
+    percentualConclusao,
     solvedOccurrences,
     pendingOccurrences,
   }: Construction) => {
     navigation.navigate('Plans', {
       id,
       descType,
-      name,
-      img,
-      completionPercentage,
+      nome,
+      imgSystemPath,
+      percentualConclusao,
       solvedOccurrences,
       pendingOccurrences,
     });
@@ -109,10 +195,7 @@ const Dashboard: FC<ConstructionProps> = () => {
           <IconInputFilter name="search" size={20} color={iconColor} />
         </ContainerInputFilter>
 
-        <LoadingModal
-          text="Sincronizando dados..."
-          loading={listConstruction.length <= 0 && loading}
-        />
+        <LoadingModal text="Sincronizando dados..." loading={loading} />
 
         <List
           data={filteredConstruction}
@@ -122,7 +205,12 @@ const Dashboard: FC<ConstructionProps> = () => {
           renderItem={({ item }) => (
             <ContainerConstruction onPress={() => handleNavigateToPlans(item)}>
               <ImgConstruction
-                source={{ uri: `data:image/png;base64,${item.imgBase64}` }}
+                source={{
+                  uri:
+                    Platform.OS === 'android'
+                      ? `file://${item.imgSystemPath}`
+                      : `${item.imgSystemPath}`,
+                }}
               />
               <ContainerText>
                 <TextTypeConstruction>{item.descType}</TextTypeConstruction>

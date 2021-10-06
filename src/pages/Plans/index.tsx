@@ -1,7 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
+import { AxiosResponse } from 'axios';
 import { Plan, PlansScreenRouteProp } from '~/models/plans.model';
 
 import InputFilter from '~/components/InputFilter';
@@ -35,7 +36,10 @@ import {
   TextTypePlan,
   TextNamePlan,
 } from './styles';
-import { getPlansList } from '~/services/plansService';
+import { isConnected, normalizeRealmData } from '~/utils/utils';
+import getRealm from '~/services/realm';
+import api from '~/services/api';
+import { getPlansModelAdapter } from '~/services/plansService';
 
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
@@ -43,43 +47,72 @@ const Plans: React.FC = () => {
 
   const {
     id: constructionId,
-    img,
-    completionPercentage,
+    imgSystemPath,
+    percentualConclusao,
     solvedOccurrences = 0,
     pendingOccurrences = 0,
   } = route.params;
 
-  const [plans, setPlans] = useState<Array<Plan>>([]);
+  const [listPlans, setListPlans] = useState<Array<Plan>>([]);
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
-  const [loading, setLoading] = useState<boolean>(false);
 
   async function loadPlans() {
-    setLoading(true);
-    try {
-      const response = await getPlansList({ constructionId });
-      setPlans(response);
-      setFilteredPlans(response);
-      setLoading(false);
-    } catch (error) {
-      setPlans([]);
-      setFilteredPlans([]);
-      setLoading(false);
-      Alert.alert('Ops', `Ocorreu um erro: ${error}`);
+    const realm = await getRealm();
+
+    const data = realm
+      .objects('Plans')
+      .filtered(`obraId = ${constructionId}`)
+      .sorted('nome');
+
+    const dataNormalized = normalizeRealmData<Array<Plan>>(data);
+
+    setListPlans(dataNormalized);
+    setFilteredPlans(dataNormalized);
+
+    if (await isConnected()) {
+      const response: AxiosResponse<Array<Plan>> = await api.get(
+        '/api/v1/plantas',
+      );
+
+      const apiPlans = response.data.filter(
+        plan => plan.obraId === constructionId && plan.ativo === 1,
+      );
+
+      const newApiPlans = await getPlansModelAdapter(apiPlans);
+
+      realm.write(() => {
+        newApiPlans.forEach(plan => {
+          realm.create('Plans', plan, Realm.UpdateMode.All);
+        });
+      });
+
+      setListPlans(newApiPlans);
+      setFilteredPlans(newApiPlans);
     }
+
+    realm.close();
   }
 
   useEffect(() => {
     loadPlans();
   }, []);
 
+  useEffect(() => {
+    const listPlansConstruction = listPlans.filter(
+      plan => plan.obraId === constructionId,
+    );
+
+    setFilteredPlans(listPlansConstruction);
+  }, [listPlans]);
+
   const handleFilter = (planName: string) => {
     if (planName) {
-      const filtered = plans.filter(p =>
+      const filtered = listPlans.filter(p =>
         p.name.toLowerCase().includes(planName.toLowerCase()),
       );
       setFilteredPlans(filtered);
     } else {
-      setFilteredPlans(plans);
+      setFilteredPlans(listPlans);
     }
   };
 
@@ -93,12 +126,19 @@ const Plans: React.FC = () => {
     <Container>
       <ConstructionCard>
         <ContainerImgProgress>
-          <ConstructionImg source={{ uri: img }} />
+          <ConstructionImg
+            source={{
+              uri:
+                Platform.OS === 'android'
+                  ? `file://${imgSystemPath}`
+                  : `${imgSystemPath}`,
+            }}
+          />
           <ContainerProgress>
             <TextProgress>Conclusão da obra</TextProgress>
             <ContainerProgressAndLabel>
               <Progress.Bar
-                progress={Number(completionPercentage) / 100}
+                progress={Number(percentualConclusao) / 100}
                 width={200}
                 height={10}
                 color={colors.green}
@@ -106,7 +146,7 @@ const Plans: React.FC = () => {
                 unfilledColor={colors.black_strong}
               />
               <ValueProgress>
-                {Number(completionPercentage).toFixed()} %
+                {Number(percentualConclusao).toFixed()} %
               </ValueProgress>
             </ContainerProgressAndLabel>
           </ContainerProgress>
@@ -144,15 +184,18 @@ const Plans: React.FC = () => {
         <List
           data={filteredPlans}
           keyExtractor={(plan: Plan) => String(plan.id)}
-          onRefresh={loadPlans}
+          // onRefresh={loadPlans}
           numColumns={2}
-          refreshing={loading}
+          // refreshing={loading}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handleNavigateToPlan(item)}>
               <ImgPlan
                 source={{
-                  uri: item.img,
+                  uri:
+                    Platform.OS === 'android'
+                      ? `file://${item.imgSystemPath}`
+                      : `${item.imgSystemPath}`,
                 }}
               />
               <TextTypePlan>{item.descType}</TextTypePlan>

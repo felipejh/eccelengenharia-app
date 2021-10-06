@@ -20,18 +20,14 @@ export interface Plan {
   nome: string;
   name: string;
   tipo: number;
-  type: number;
   descType: string;
   ativo: number;
-  active: number;
   obraId: Construction['id'];
-  constructionId: Construction['id'];
   url: string;
-  img: string;
+  imagem: string;
   usuarioCreateId: number;
-  userCreateId: number;
   usuarioUpdateId: number;
-  userUpdatedId: number;
   createdAt: string;
   updatedAt: string;
+  imgSystemPath?: string;
 }

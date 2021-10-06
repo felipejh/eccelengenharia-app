@@ -50,9 +50,9 @@ export const ConstructionStack: FC = () => (
       name="Plans"
       component={Plans}
       options={({ route }: PlansProps) => {
-        const { name, descType } = route.params;
+        const { nome, descType } = route.params;
         return {
-          headerTitle: () => <StackTitle title={name} subtitle={descType} />,
+          headerTitle: () => <StackTitle title={nome} subtitle={descType} />,
           headerTitleAlign: 'center',
           headerTintColor: '#fff',
           headerBackTitleVisible: false,

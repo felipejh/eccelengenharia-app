@@ -30,7 +30,7 @@ const DropdownSelect: FC<Omit<Props, 'children'>> = ({
         useNativeAndroidPickerStyle={false}
         placeholder={{}}
         items={items.map(item => {
-          let label = String(`${item.id} - ${item.title}`);
+          let label = String(`${item.id} - ${item.titulo}`);
           if (label.length > 43) {
             label = `${label.substr(0, 42)}...`;
           }

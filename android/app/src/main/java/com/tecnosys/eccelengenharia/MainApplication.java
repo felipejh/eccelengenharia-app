@@ -1,9 +1,11 @@
 package com.tecnosys.eccelengenharia;
 
+import io.realm.react.RealmReactPackage;
 import com.microsoft.codepush.react.CodePush;
 import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactApplication;
 import com.microsoft.codepush.react.CodePush;
 import com.facebook.react.ReactInstanceManager;
@@ -12,8 +14,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import com.facebook.react.bridge.JSIModulePackage; // Reanimated
-import com.swmansion.reanimated.ReanimatedJSIModulePackage; // Reanimated
+// import com.facebook.react.bridge.JSIModulePackage; // Reanimated
+// import com.swmansion.reanimated.ReanimatedJSIModulePackage; // Reanimated
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -28,6 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
+          new RNFetchBlobPackage();
+          new RealmReactPackage();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           return packages;
@@ -47,10 +51,10 @@ public class MainApplication extends Application implements ReactApplication {
         }
 
         // Reanimated 2
-        @Override
-        protected JSIModulePackage getJSIModulePackage() {
-          return new ReanimatedJSIModulePackage();
-        }
+        // @Override
+        // protected JSIModulePackage getJSIModulePackage() {
+        //   return new ReanimatedJSIModulePackage();
+        // }
 
       };
 
