@@ -6,17 +6,17 @@ import { useSelector } from 'react-redux';
 import { useRoute } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/stack';
 
+import * as Sentry from '@sentry/react-native';
+
 import ImageZoom, { IOnClick } from 'react-native-image-pan-zoom';
 import pt from 'date-fns/locale/pt';
 import { format, parseISO } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
 import {
-  getOccurrenceByPlan,
   postOccurrence,
   putPostponedOccurrence,
   putConclusionOccurrence,
 } from '~/services/occurrencesServices';
-import { getGroups } from '~/services/groupsService';
 
 import {
   OccurrencesScreenRouteProp,
@@ -39,8 +39,9 @@ import {
 import Button from '~/components/Button';
 import DropdownSelect from '~/components/DropdownSelect';
 import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence';
-import { getAppointments } from '~/services/appointmentsService';
 import { Appointment } from '~/models/appointment.model';
+import getRealm from '~/services/realm';
+import { normalizeRealmData } from '~/utils/utils';
 
 interface NormalizedMarker {
   top: string;
@@ -58,11 +59,15 @@ export interface ExistsMarkers {
 
 const Occurrences: React.FC = () => {
   const route = useRoute<OccurrencesScreenRouteProp>();
-  const { constructionId, id: planId, imgSystemPath } = route.params;
+  const {
+    obraId: constructionId,
+    id: planId,
+    imgSystemPath = '',
+  } = route.params;
 
   const { userId } = useSelector((state: RootState) => state.auth);
 
-  const [loadingProcess, setLoadingProcess] = useState<boolean>(false);
+  const [loadingProcess, setLoadingProcess] = useState<boolean>(true);
 
   const [showConcluded, setShowConcluded] = useState<boolean>(false);
   const [showCardClickMarker, setShowCardClickMarker] =
@@ -102,18 +107,15 @@ const Occurrences: React.FC = () => {
     Array<NormalizedMarker> | undefined
   >([]);
 
-  Image.getSize(imgSystemPath || '', (widthImg, heightImg) => {
-    setWidth(widthImg);
-    setHeight(heightImg);
-  });
-
   useEffect(() => {
     if (width && height) {
+      console.tron.log('4');
       setImageHeight(Math.round(height * (dimensions.width / width)));
     }
   }, [width, height]);
 
   useEffect(() => {
+    console.tron.log('3', filteredMarkers);
     const normalizedMarkersList = filteredMarkers?.map(
       filteredMarker =>
         ({
@@ -130,26 +132,8 @@ const Occurrences: React.FC = () => {
   }, [filteredMarkers]);
 
   useEffect(() => {
-    async function loadGroups() {
-      const response = await getGroups();
-      setGroups(response);
-      setSelectedGroup(response ? response[0].id : undefined);
-    }
-
-    loadGroups();
-  }, []);
-
-  useEffect(() => {
-    async function loadAppointments() {
-      const response = await getAppointments();
-      setAppointments(response);
-    }
-
-    loadAppointments();
-  }, []);
-
-  useEffect(() => {
     if (selectedGroup && groups && appointments && selectedGroup) {
+      console.tron.log('2');
       const filteredAppointments = appointments.filter(
         a => a.gruposapontamentoId === selectedGroup,
       );
@@ -159,17 +143,71 @@ const Occurrences: React.FC = () => {
   }, [selectedGroup, groups, appointments, selectedGroup]);
 
   useEffect(() => {
+    // async function loadOccurrences() {
+    //   const response = await getOccurrenceByPlan({
+    //     constructionId,
+    //     planId,
+    //   });
+
+    //   setMarkers(response);
+
+    //   const newFilteredMarkers = response.filter(m => !m.concluido);
+    //   setNotConcludedMarkers(newFilteredMarkers);
+    //   setFilteredMarkers(newFilteredMarkers);
+    // }
     async function loadOccurrences() {
-      const response = await getOccurrenceByPlan({
-        constructionId,
-        planId,
-      });
+      await Image.getSize(
+        Platform.OS === 'android'
+          ? `file://${imgSystemPath}`
+          : `${imgSystemPath}`,
+        (widthImg, heightImg) => {
+          setWidth(widthImg);
+          setHeight(heightImg);
+        },
+      );
 
-      setMarkers(response);
+      const realm = await getRealm();
+      try {
+        // Occurrences
+        const dataAllOc = realm
+          .objects('Occurrences')
+          .filtered(`obraId = ${constructionId} && plantaId = ${planId}`);
 
-      const newFilteredMarkers = response.filter(m => !m.concluido);
-      setNotConcludedMarkers(newFilteredMarkers);
-      setFilteredMarkers(newFilteredMarkers);
+        const normalizedAllOc =
+          normalizeRealmData<Array<Occurrence>>(dataAllOc);
+
+        setMarkers(normalizedAllOc);
+
+        const notConcludedMarkersRealm = realm
+          .objects('Occurrences')
+          .filtered(
+            `concluido != 1 && obraId = ${constructionId} && plantaId = ${planId}`,
+          );
+        const normalizedNotConcludedMarkers = normalizeRealmData<
+          Array<Occurrence>
+        >(notConcludedMarkersRealm);
+
+        setNotConcludedMarkers(normalizedNotConcludedMarkers);
+        setFilteredMarkers(normalizedNotConcludedMarkers);
+
+        // Groups
+        const realmGroups = realm.objects('Groups').sorted('id');
+        const realmGroupsNormalized =
+          normalizeRealmData<Array<Group>>(realmGroups);
+
+        setGroups(realmGroupsNormalized);
+        setSelectedGroup(realmGroupsNormalized[0].id);
+
+        // Appointments
+        const data = realm.objects('Appointments').sorted('id');
+        const normalizedData = normalizeRealmData<Array<Appointment>>(data);
+
+        setAppointments(normalizedData);
+      } catch (error) {
+        Sentry.captureException(error);
+      } finally {
+        realm.close();
+      }
     }
 
     loadOccurrences();
@@ -179,6 +217,7 @@ const Occurrences: React.FC = () => {
     if (showConcluded) {
       setFilteredMarkers(markers);
     } else {
+      console.tron.log('1');
       setFilteredMarkers(notConcludedMarkers);
     }
   }, [showConcluded]);

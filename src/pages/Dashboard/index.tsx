@@ -124,6 +124,8 @@ const Dashboard: FC<ConstructionProps> = () => {
         );
       } catch {
         setLoading(false);
+      } finally {
+        setLoading(false);
       }
     }
     loadCache();

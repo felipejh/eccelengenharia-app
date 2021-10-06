@@ -28,7 +28,6 @@ import bgLogin from '~/assets/bg_login.png';
 import logo from '~/assets/logo_inicial.png';
 import { RootState } from '~/store/modules/rootReducer';
 import colors from '~/styles/colors';
-import { deleteImgFolder } from '~/utils/utils';
 
 interface SignInFormData {
   user: string;
@@ -101,16 +100,22 @@ const SignIn: React.FC = () => {
   }, []);
 
   const handleSignIn = async ({ user, password }: SignInFormData) => {
-    // if (!user || !password) {
-    //   Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
-    //   return;
-    // }
+    if (!user || !password) {
+      Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
+      return;
+    }
     // await deleteImgFolder();
 
+    // dispatch(
+    //   signInRequest({
+    //     user: 'compras@eccelengenharia.com.br',
+    //     password: 'eccel123',
+    //   }),
+    // );
     dispatch(
       signInRequest({
-        user: 'compras@eccelengenharia.com.br',
-        password: 'eccel123',
+        user,
+        password,
       }),
     );
   };
