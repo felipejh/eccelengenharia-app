@@ -67,7 +67,7 @@ const Occurrences: React.FC = () => {
 
   const { userId } = useSelector((state: RootState) => state.auth);
 
-  const [loadingProcess, setLoadingProcess] = useState<boolean>(true);
+  const [loadingProcess, setLoadingProcess] = useState<boolean>(false);
 
   const [showConcluded, setShowConcluded] = useState<boolean>(false);
   const [showCardClickMarker, setShowCardClickMarker] =
@@ -109,13 +109,11 @@ const Occurrences: React.FC = () => {
 
   useEffect(() => {
     if (width && height) {
-      console.tron.log('4');
       setImageHeight(Math.round(height * (dimensions.width / width)));
     }
   }, [width, height]);
 
   useEffect(() => {
-    console.tron.log('3', filteredMarkers);
     const normalizedMarkersList = filteredMarkers?.map(
       filteredMarker =>
         ({
@@ -133,7 +131,6 @@ const Occurrences: React.FC = () => {
 
   useEffect(() => {
     if (selectedGroup && groups && appointments && selectedGroup) {
-      console.tron.log('2');
       const filteredAppointments = appointments.filter(
         a => a.gruposapontamentoId === selectedGroup,
       );
@@ -214,13 +211,14 @@ const Occurrences: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (showConcluded) {
-      setFilteredMarkers(markers);
-    } else {
-      console.tron.log('1');
-      setFilteredMarkers(notConcludedMarkers);
+    if (notConcludedMarkers) {
+      if (showConcluded) {
+        setFilteredMarkers(markers);
+      } else {
+        setFilteredMarkers(notConcludedMarkers);
+      }
     }
-  }, [showConcluded]);
+  }, [showConcluded, notConcludedMarkers]);
 
   const clearAllProcess = () => {
     if (isNewMarker) setIsNewMarker(false);
