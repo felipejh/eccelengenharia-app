@@ -65,33 +65,7 @@ const SignIn: React.FC = () => {
         }
       };
 
-      const requestCameraPermission = async () => {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            {
-              title: 'Cool Photo App Camera Permission',
-              message:
-                'Cool Photo App needs access to your camera ' +
-                'so you can take awesome pictures.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            Alert.alert(
-              'Este aplicativo não funcionará offline sem permissão da câmera',
-            );
-          }
-        } catch (err) {
-          Alert.alert(
-            `Ocorreu um erro ao solicitar permissão de câmera: ${err}`,
-          );
-        }
-      };
       if (Platform.OS === 'android') {
-        await requestCameraPermission();
         await requestExternalStoragePermissions();
       }
     }
