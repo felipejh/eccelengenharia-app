@@ -140,6 +140,22 @@ const Occurrences: React.FC = () => {
   }, [selectedGroup, groups, appointments, selectedGroup]);
 
   useEffect(() => {
+    async function getImageSize() {
+      await Image.getSize(
+        Platform.OS === 'android'
+          ? `file://${imgSystemPath}`
+          : `${imgSystemPath}`,
+        (widthImg, heightImg) => {
+          setWidth(widthImg);
+          setHeight(heightImg);
+        },
+      );
+    }
+
+    getImageSize();
+  }, []);
+
+  useEffect(() => {
     // async function loadOccurrences() {
     //   const response = await getOccurrenceByPlan({
     //     constructionId,
@@ -153,16 +169,6 @@ const Occurrences: React.FC = () => {
     //   setFilteredMarkers(newFilteredMarkers);
     // }
     async function loadOccurrences() {
-      await Image.getSize(
-        Platform.OS === 'android'
-          ? `file://${imgSystemPath}`
-          : `${imgSystemPath}`,
-        (widthImg, heightImg) => {
-          setWidth(widthImg);
-          setHeight(heightImg);
-        },
-      );
-
       const realm = await getRealm();
       try {
         // Occurrences
@@ -207,8 +213,10 @@ const Occurrences: React.FC = () => {
       }
     }
 
-    loadOccurrences();
-  }, []);
+    if (width > 0 && height > 0) {
+      loadOccurrences();
+    }
+  }, [width, height]);
 
   useEffect(() => {
     if (notConcludedMarkers) {
