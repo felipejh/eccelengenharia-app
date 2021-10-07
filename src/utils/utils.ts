@@ -23,12 +23,23 @@ export async function getImgSystemPath(
     const PictureDir =
       Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
 
-    const path = await config({
-      path: `${PictureDir}/Eccel/${imgName}`,
-    }).fetch('GET', imgUri);
+    const systemPath = `${PictureDir}/Eccel/${imgName}`;
 
-    return path.data;
+    const exists = await fs.exists(systemPath);
+
+    if (!exists) {
+      const path = await config({
+        path: systemPath,
+        fileCache: true,
+        overwrite: true,
+      }).fetch('GET', imgUri);
+
+      return path.data;
+    }
+
+    return systemPath;
   } catch (error) {
+    Sentry.captureException(`getImgSystemPath: ${error}`);
     return '';
   }
 }
