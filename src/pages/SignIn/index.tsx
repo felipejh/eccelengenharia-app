@@ -78,7 +78,6 @@ const SignIn: React.FC = () => {
       Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
       return;
     }
-    // await deleteImgFolder();
 
     // dispatch(
     //   signInRequest({
