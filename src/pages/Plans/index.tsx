@@ -40,6 +40,7 @@ import { isConnected, normalizeRealmData } from '~/utils/utils';
 import getRealm from '~/services/realm';
 import api from '~/services/api';
 import { getPlansModelAdapter } from '~/services/plansService';
+import ModalChoices from '~/pages/Plans/ModalChoices';
 
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
@@ -55,6 +56,8 @@ const Plans: React.FC = () => {
 
   const [listPlans, setListPlans] = useState<Array<Plan>>([]);
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
+  const [selectedPlan, setSelectedPlan] = useState<Plan>();
+  const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
 
   async function loadPlans() {
     const realm = await getRealm();
@@ -116,14 +119,34 @@ const Plans: React.FC = () => {
     }
   };
 
-  const handleNavigateToPlan = (plan: Plan) => {
+  const handlePressPlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setIsVisibleModal(true);
+  };
+
+  const handleNavigateToChecklist = () => {
+    setIsVisibleModal(false);
+    navigation.navigate('Checklist', {
+      ...selectedPlan,
+    });
+  };
+
+  const handleNavigateToOccurrences = () => {
+    setIsVisibleModal(false);
     navigation.navigate('Occurrences', {
-      ...plan,
+      ...selectedPlan,
     });
   };
 
   return (
     <Container>
+      <ModalChoices
+        isVisible={isVisibleModal}
+        onClickChecklist={handleNavigateToChecklist}
+        onClickOccurrences={handleNavigateToOccurrences}
+        onClickCancel={() => setIsVisibleModal(false)}
+      />
+
       <ConstructionCard>
         <ContainerImgProgress>
           <ConstructionImg
@@ -189,7 +212,7 @@ const Plans: React.FC = () => {
           // refreshing={loading}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <ContainerPlan onPress={() => handleNavigateToPlan(item)}>
+            <ContainerPlan onPress={() => handlePressPlan(item)}>
               <ImgPlan
                 source={{
                   uri:

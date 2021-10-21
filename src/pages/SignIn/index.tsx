@@ -74,23 +74,23 @@ const SignIn: React.FC = () => {
   }, []);
 
   const handleSignIn = async ({ user, password }: SignInFormData) => {
-    if (!user || !password) {
-      Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
-      return;
-    }
+    // if (!user || !password) {
+    //   Alert.alert('Atenção!', 'Usuário e senha são obrigatórios.');
+    //   return;
+    // }
 
-    // dispatch(
-    //   signInRequest({
-    //     user: 'compras@eccelengenharia.com.br',
-    //     password: 'eccel123',
-    //   }),
-    // );
     dispatch(
       signInRequest({
-        user,
-        password,
+        user: 'compras@eccelengenharia.com.br',
+        password: 'eccel123',
       }),
     );
+    // dispatch(
+    //   signInRequest({
+    //     user,
+    //     password,
+    //   }),
+    // );
   };
 
   return (

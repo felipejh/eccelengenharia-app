@@ -8,6 +8,7 @@ export type StackParamList = {
   Drawer: undefined;
   Plans: Construction;
   Occurrences: Plan;
+  Checklist: Plan;
 };
 
 export type DrawerParamList = {

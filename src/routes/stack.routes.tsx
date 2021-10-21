@@ -22,6 +22,7 @@ import { PlansProps } from '~/models/plans.model';
 import colors from '~/styles/colors';
 import { ConstructionProps } from '~/models/construction.model';
 import SignUp from '~/pages/SignUp';
+import Checklist from '~/pages/Checklist';
 
 const Stack = createStackNavigator<StackParamList>();
 
@@ -53,6 +54,21 @@ export const ConstructionStack: FC = () => (
         const { nome, descType } = route.params;
         return {
           headerTitle: () => <StackTitle title={nome} subtitle={descType} />,
+          headerTitleAlign: 'center',
+          headerTintColor: '#fff',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: colors.gray,
+          },
+        };
+      }}
+    />
+    <Stack.Screen
+      name="Checklist"
+      component={Checklist}
+      options={() => {
+        return {
+          headerTitle: 'Checklist',
           headerTitleAlign: 'center',
           headerTintColor: '#fff',
           headerBackTitleVisible: false,

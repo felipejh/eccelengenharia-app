@@ -1,3 +1,19 @@
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { StackParamList } from '~/routes/@types';
+
+export type ChecklistScreenRouteProp = RouteProp<StackParamList, 'Occurrences'>;
+
+export type ChecklistScreenNavigationProp = StackNavigationProp<
+  StackParamList,
+  'Checklist'
+>;
+
+export type ChecklistProps = {
+  navigation: ChecklistScreenNavigationProp;
+  route: ChecklistScreenRouteProp;
+};
+
 export interface Checklist {
   id: number;
   item_conferir: string;
