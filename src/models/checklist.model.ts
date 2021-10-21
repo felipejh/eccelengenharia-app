@@ -24,7 +24,7 @@ export interface Checklist {
   gruposapontamentoId: number;
   usuarioCreateId: number;
   usuarioUpdateId: number | null;
-  answers?: {
+  answers?: Array<{
     id: number;
     situacao: string;
     dth_resposta: string;
@@ -41,5 +41,5 @@ export interface Checklist {
       nome: string;
     };
     usuarioUpdate: string | null;
-  };
+  }>;
 }
