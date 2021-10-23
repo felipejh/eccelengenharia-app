@@ -6,11 +6,14 @@ import { ChecklistAnswer } from '~/models/checklist-answers.model';
 
 export const Container = styled.View``;
 
-export const ContainerHeader = styled.View``;
+export const ContainerHeader = styled.View`
+  background: ${colors.orange_light};
+  padding: 20px;
+`;
 
 export const TextItemConferir = styled.Text`
   font-family: ${fonts.heading};
-  color: ${colors.black_light};
+  color: ${colors.white};
   font-size: 18px;
 `;
 
@@ -20,12 +23,12 @@ export const ContainerTolerancia = styled.View`
 
 export const TextToleranciaLabel = styled.Text`
   font-family: ${fonts.heading};
-  color: ${colors.black_light};
+  color: ${colors.white};
 `;
 
 export const TextToleranciaValue = styled.Text`
   font-family: ${fonts.text};
-  color: ${colors.black_light};
+  color: ${colors.white};
 `;
 
 export const List = styled(
@@ -36,12 +39,24 @@ export const List = styled(
   },
 })``;
 
-export const ContainerList = styled.View``;
+export const ContainerList = styled.View`
+  padding: 5px 10px;
+`;
 
 export const ContainerRow = styled.View`
   flex-direction: row;
+  align-items: baseline;
 `;
 
-export const TextLabel = styled.Text``;
+export const TextLabel = styled.Text`
+  font-size: 14px;
+  font-family: ${fonts.text};
+  color: ${colors.black_light};
+`;
 
-export const TextValue = styled.Text``;
+export const TextValue = styled.Text`
+  font-size: 16px;
+  font-family: ${fonts.heading};
+  color: ${colors.black_light};
+  text-transform: capitalize;
+`;

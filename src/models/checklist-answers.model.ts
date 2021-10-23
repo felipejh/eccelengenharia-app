@@ -28,4 +28,9 @@ export interface ChecklistAnswer {
   ocorrenciaId: number | null;
   usuarioCreateId: number | null;
   usuarioUpdateId: number | null;
+  usuarioCreate?: {
+    id: number;
+    usuario: string;
+    nome: string;
+  };
 }

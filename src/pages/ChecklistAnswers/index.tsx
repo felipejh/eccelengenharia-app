@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { useRoute } from '@react-navigation/native';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   ChecklistAnswer,
   ChecklistAnswersScreenRouteProp,
@@ -19,10 +21,10 @@ import {
   TextValue,
 } from './styles';
 
-const ChecklistAnswers: React.FC = () => {
+const ChecklistAnswers: FC = () => {
   const route = useRoute<ChecklistAnswersScreenRouteProp>();
   const { item_conferir, tolerancia, answers } = route.params;
-  console.tron.log(answers);
+
   return (
     <Container>
       <List
@@ -37,18 +39,30 @@ const ChecklistAnswers: React.FC = () => {
             </ContainerTolerancia>
           </ContainerHeader>
         }
-        renderItem={({ item }) => (
-          <ContainerList>
-            <ContainerRow>
-              <TextLabel>Situação: </TextLabel>
-              <TextLabel>{item.situacao}</TextLabel>
-            </ContainerRow>
-            <ContainerRow>
-              <TextLabel>Data: </TextLabel>
-              <TextLabel>{item.dth_resposta}</TextLabel>
-            </ContainerRow>
-          </ContainerList>
-        )}
+        renderItem={({ item }) => {
+          const date = item.dth_resposta
+            ? format(parseISO(item.dth_resposta), 'dd/MM/yyyy HH:mm', {
+                locale: ptBR,
+              })
+            : '';
+
+          return (
+            <ContainerList>
+              <ContainerRow>
+                <TextLabel>Data: </TextLabel>
+                <TextValue>{date}</TextValue>
+              </ContainerRow>
+              <ContainerRow>
+                <TextLabel>Situação: </TextLabel>
+                <TextValue>{item.situacao}</TextValue>
+              </ContainerRow>
+              <ContainerRow>
+                <TextLabel>Usuário: </TextLabel>
+                <TextValue>{item.usuarioCreate?.nome}</TextValue>
+              </ContainerRow>
+            </ContainerList>
+          );
+        }}
       />
     </Container>
   );
