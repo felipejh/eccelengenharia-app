@@ -1,4 +1,5 @@
-﻿import { Construction } from '~/models/construction.model';
+﻿import { Checklist } from '~/models/checklist.model';
+import { Construction } from '~/models/construction.model';
 import { Plan } from '~/models/plans.model';
 
 export type StackParamList = {
@@ -9,6 +10,7 @@ export type StackParamList = {
   Plans: Construction;
   Occurrences: Plan;
   Checklist: Plan;
+  ChecklistAnswers: Checklist;
 };
 
 export type DrawerParamList = {

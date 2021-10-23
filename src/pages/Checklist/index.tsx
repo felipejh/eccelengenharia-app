@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
 import { parseISO, isAfter } from 'date-fns';
 import { Checklist, ChecklistScreenRouteProp } from '~/models/checklist.model';
@@ -27,6 +27,7 @@ import {
 import colors from '~/styles/colors';
 
 const ChecklistScreen: FC = () => {
+  const navigation = useNavigation();
   const route = useRoute<ChecklistScreenRouteProp>();
   const { id } = route.params;
 
@@ -123,7 +124,9 @@ const ChecklistScreen: FC = () => {
   }, []);
 
   const handlePressDetails = (item: Checklist) => {
-    console.tron.log(item);
+    navigation.navigate('ChecklistAnswers', {
+      ...item,
+    });
   };
 
   const handlePressDisapprove = (item: Checklist) => {
