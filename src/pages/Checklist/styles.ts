@@ -17,7 +17,7 @@ export const List = styled(FlatList as new () => FlatList<Checklist>).attrs({
 
 export const ContainerList = styled.View`
   border-radius: 4px;
-  padding: 15px;
+  padding: 15px 15px 0;
   elevation: 4;
   shadow-opacity: 0.75;
   shadow-radius: 5px;
@@ -25,6 +25,27 @@ export const ContainerList = styled.View`
   shadow-offset: 0px 0px;
   margin: 10px 10px 0;
   background: ${colors.white};
+`;
+
+export const ContainerButtons = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 0 10px;
+  /* border: 1px solid #f29; */
+`;
+
+export const TextDetails = styled.Text`
+  font-family: ${fonts.heading};
+  color: ${colors.orange_strong};
+`;
+
+export const TextApprove = styled.Text`
+  font-family: ${fonts.heading};
+  color: ${colors.green};
+`;
+export const TextDisapprove = styled.Text`
+  font-family: ${fonts.heading};
+  color: ${colors.red};
 `;
 
 export const TextItemConferir = styled.Text`

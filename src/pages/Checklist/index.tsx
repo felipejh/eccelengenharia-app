@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Text } from 'react-native';
+import { Alert, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
 import { parseISO, isAfter } from 'date-fns';
@@ -12,6 +12,10 @@ import {
   Container,
   List,
   ContainerList,
+  ContainerButtons,
+  TextDetails,
+  TextApprove,
+  TextDisapprove,
   TextItemConferir,
   ContainerTolerancia,
   TextToleranciaLabel,
@@ -118,6 +122,38 @@ const ChecklistScreen: FC = () => {
     loadPlan();
   }, []);
 
+  const handlePressDetails = (item: Checklist) => {
+    console.tron.log(item);
+  };
+
+  const handlePressDisapprove = (item: Checklist) => {
+    console.tron.log(item);
+    Alert.alert('Reprovar', 'Deseja reprovar o checklist?', [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Sim',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const handlePressApprove = (item: Checklist) => {
+    console.tron.log(item);
+    Alert.alert('Aprovar', 'Deseja aprovar o checklist?', [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Sim',
+        style: 'cancel',
+      },
+    ]);
+  };
+
   return (
     <Container>
       <List
@@ -132,10 +168,10 @@ const ChecklistScreen: FC = () => {
               : colors.red;
 
           if (!item.answers?.[0].situacao) {
-            status = 'VERIFICAR';
+            status = 'Não respondido';
             statusColor = colors.yellow;
           }
-          status = 'VERIFICAR';
+          status = 'Não respondido';
           statusColor = colors.gray_light;
 
           return (
@@ -150,6 +186,18 @@ const ChecklistScreen: FC = () => {
                 <TextStatusLabel>Situação: </TextStatusLabel>
                 <TextStatusValue color={statusColor}>{status}</TextStatusValue>
               </ContainerStatus>
+
+              <ContainerButtons>
+                <TouchableOpacity onPress={() => handlePressDetails(item)}>
+                  <TextDetails>Ver detalhes</TextDetails>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handlePressDisapprove(item)}>
+                  <TextDisapprove>Reprovar</TextDisapprove>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handlePressApprove(item)}>
+                  <TextApprove>Aprovar</TextApprove>
+                </TouchableOpacity>
+              </ContainerButtons>
             </ContainerList>
           );
         }}
