@@ -54,7 +54,7 @@ const ChecklistAnswers: FC = () => {
               </ContainerRow>
               <ContainerRow>
                 <TextLabel>Situação: </TextLabel>
-                <TextValue>{item.situacao}</TextValue>
+                <TextValue status={item.situacao}>{item.situacao}</TextValue>
               </ContainerRow>
               <ContainerRow>
                 <TextLabel>Usuário: </TextLabel>

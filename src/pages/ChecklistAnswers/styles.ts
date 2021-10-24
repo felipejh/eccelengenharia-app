@@ -54,9 +54,19 @@ export const TextLabel = styled.Text`
   color: ${colors.black_light};
 `;
 
-export const TextValue = styled.Text`
+export const TextValue = styled.Text<{ status?: string }>`
   font-size: 16px;
   font-family: ${fonts.heading};
   color: ${colors.black_light};
   text-transform: capitalize;
+  ${({ status }) =>
+    status === 'APROVADO' &&
+    `
+    color: ${colors.green};
+  `}
+  ${({ status }) =>
+    status === 'REPROVADO' &&
+    `
+    color: ${colors.red};
+  `};
 `;
