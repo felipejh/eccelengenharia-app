@@ -163,19 +163,7 @@ const ChecklistScreen: FC = () => {
         data={listChecklists}
         keyExtractor={(checklist: Checklist) => String(checklist.id)}
         renderItem={({ item }) => {
-          let status = item.answers?.[0].situacao;
-
-          let statusColor =
-            item.answers?.[0].situacao === 'APROVADO'
-              ? colors.green
-              : colors.red;
-
-          if (!item.answers?.[0].situacao) {
-            status = 'Não respondido';
-            statusColor = colors.yellow;
-          }
-          status = 'Não respondido';
-          statusColor = colors.gray_light;
+          const status = item.answers?.[0].situacao;
 
           return (
             <ContainerList>
@@ -187,7 +175,11 @@ const ChecklistScreen: FC = () => {
 
               <ContainerStatus>
                 <TextStatusLabel>Situação: </TextStatusLabel>
-                <TextStatusValue color={statusColor}>{status}</TextStatusValue>
+                {status ? (
+                  <TextStatusValue status={status}>{status}</TextStatusValue>
+                ) : (
+                  <TextStatusValue>Não respondido</TextStatusValue>
+                )}
               </ContainerStatus>
 
               <ContainerButtons>
