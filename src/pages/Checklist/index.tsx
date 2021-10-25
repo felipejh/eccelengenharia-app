@@ -3,6 +3,7 @@ import { Alert, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
 import { parseISO, isAfter } from 'date-fns';
+import * as Sentry from '@sentry/react-native';
 import { Checklist, ChecklistScreenRouteProp } from '~/models/checklist.model';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
@@ -24,104 +25,73 @@ import {
   TextStatusLabel,
   TextStatusValue,
 } from './styles';
-import colors from '~/styles/colors';
 
 const ChecklistScreen: FC = () => {
   const navigation = useNavigation();
   const route = useRoute<ChecklistScreenRouteProp>();
-  const { id } = route.params;
+  const { id: planId } = route.params;
 
   const [listChecklists, setListChecklists] =
     useState<Array<Checklist> | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    async function loadPlan() {
-      try {
-        setLoading(true);
-        const response: AxiosResponse<Plan> = await api.get(
-          `/api/v1/plantas/${id}`,
-        );
+  async function loadListChecklists() {
+    try {
+      setLoading(true);
+      const response: AxiosResponse<Plan> = await api.get(
+        `/api/v1/plantas/${planId}`,
+      );
 
-        const { data } = response;
-        // data.checklist.push(data.checklist.map(d => ({ ...d })));
-        // data.checklist.push(data.checklist.map(d => ({ ...d })));
-        // data.checklist.push(data.checklist.map(d => ({ ...d })));
+      const { data } = response;
 
-        // console.tron.log(data.checklist);
-        const test = data.checklist.map(a => {
-          const c = [
-            {
-              id: 2,
-              situacao: 'APROVADO',
-              dth_resposta: '2021-08-28T08:00:00.003Z',
-              createdAt: '2021-09-18T13:26:39.214Z',
-              updatedAt: '2021-09-18T13:26:39.214Z',
-              checklistId: 2,
-              plantaId: 1,
-              ocorrenciaId: null,
-              usuarioCreateId: 3,
-              usuarioUpdateId: null,
-              usuarioUpdate: null,
-              usuarioCreate: {
-                id: 3,
-                usuario: 'felipe',
-                nome: 'felipe',
-              },
-            },
-            {
-              id: 1,
-              situacao: 'REPROVADO',
-              dth_resposta: '2021-07-28T08:00:00.003Z',
-              createdAt: '2021-09-18T13:26:39.214Z',
-              updatedAt: '2021-09-18T13:26:39.214Z',
-              checklistId: 2,
-              plantaId: 1,
-              ocorrenciaId: null,
-              usuarioCreateId: 3,
-              usuarioUpdateId: null,
-              usuarioCreate: {
-                id: 3,
-                usuario: 'felipe',
-                nome: 'felipe',
-              },
-              usuarioUpdate: null,
-            },
-          ];
+      const dataSorted: Array<Checklist> = data.checklist.map(checklist => {
+        const answersSorted = checklist.answers?.sort((a, b) => {
+          const dateA = parseISO(a.dth_resposta);
+          const dateB = parseISO(b.dth_resposta);
 
-          return {
-            ...a,
-            answers: c,
-          };
+          if (isAfter(dateA, dateB)) {
+            return -1;
+          }
+          return 0;
         });
 
-        const dataSorted: Array<Checklist> = test.map(checklist => {
-          const answersSorted = checklist.answers?.sort((a, b) => {
-            const dateA = parseISO(a.dth_resposta);
-            const dateB = parseISO(b.dth_resposta);
+        return {
+          ...checklist,
+          answers: answersSorted,
+        };
+      });
 
-            if (isAfter(dateA, dateB)) {
-              return -1;
-            }
-            return 0;
-          });
-
-          return {
-            ...checklist,
-            answers: answersSorted,
-          };
-        });
-
-        setListChecklists(dataSorted);
-        console.tron.log(dataSorted);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
+      setListChecklists(dataSorted);
+      console.tron.log(dataSorted);
+      setLoading(false);
+    } catch {
+      setLoading(false);
     }
+  }
 
-    loadPlan();
+  useEffect(() => {
+    loadListChecklists();
   }, []);
+
+  const approveDisapprove = async (
+    type: 'APROVADO' | 'REPROVADO',
+    checklist: Checklist,
+  ) => {
+    try {
+      setLoading(true);
+      await api.post('/api/v1/checklists_answers', {
+        situacao: type,
+        dth_resposta: new Date(),
+        checklistId: checklist.id,
+        plantaId: planId,
+      });
+      loadListChecklists();
+    } catch (error) {
+      Sentry.captureException(error);
+      Alert.alert('Ocorreu um erro', `${error}`);
+      setLoading(false);
+    }
+  };
 
   const handlePressDetails = (item: Checklist) => {
     navigation.navigate('ChecklistAnswers', {
@@ -138,7 +108,7 @@ const ChecklistScreen: FC = () => {
       },
       {
         text: 'Sim',
-        style: 'cancel',
+        onPress: () => approveDisapprove('REPROVADO', item),
       },
     ]);
   };
@@ -152,7 +122,7 @@ const ChecklistScreen: FC = () => {
       },
       {
         text: 'Sim',
-        style: 'cancel',
+        onPress: () => approveDisapprove('APROVADO', item),
       },
     ]);
   };
@@ -198,7 +168,7 @@ const ChecklistScreen: FC = () => {
         }}
       />
 
-      <LoadingModal loading={loading} text="Buscando checklists" />
+      <LoadingModal loading={loading} text="Carregando..." />
     </Container>
   );
 };
