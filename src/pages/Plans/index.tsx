@@ -126,7 +126,7 @@ const Plans: React.FC = () => {
 
   const handleNavigateToChecklist = () => {
     setIsVisibleModal(false);
-    navigation.navigate('Checklist', {
+    navigation.navigate('AppointmentsGroups', {
       ...selectedPlan,
     });
   };

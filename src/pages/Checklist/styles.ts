@@ -9,6 +9,13 @@ export const Container = styled.View`
   background: ${colors.black_strong};
 `;
 
+export const TextEmpty = styled.Text`
+  font-family: ${fonts.heading};
+  color: ${colors.white};
+  font-size: 20px;
+  margin: 20px 15px;
+`;
+
 export const List = styled(FlatList as new () => FlatList<Checklist>).attrs({
   contentContainerStyle: {
     paddingBottom: 32,

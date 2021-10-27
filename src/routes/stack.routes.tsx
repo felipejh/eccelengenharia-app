@@ -24,6 +24,7 @@ import { ConstructionProps } from '~/models/construction.model';
 import SignUp from '~/pages/SignUp';
 import Checklist from '~/pages/Checklist';
 import ChecklistAnswers from '~/pages/ChecklistAnswers';
+import AppointmentsGroups from '~/pages/Checklist/AppointmentsGroups';
 
 const Stack = createStackNavigator<StackParamList>();
 
@@ -67,6 +68,21 @@ export const ConstructionStack: FC = () => (
     <Stack.Screen
       name="Checklist"
       component={Checklist}
+      options={() => {
+        return {
+          headerTitle: 'Checklist',
+          headerTitleAlign: 'center',
+          headerTintColor: '#fff',
+          headerBackTitleVisible: false,
+          headerStyle: {
+            backgroundColor: colors.gray,
+          },
+        };
+      }}
+    />
+    <Stack.Screen
+      name="AppointmentsGroups"
+      component={AppointmentsGroups}
       options={() => {
         return {
           headerTitle: 'Checklist',

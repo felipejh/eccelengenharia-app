@@ -2,7 +2,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamList } from '~/routes/@types';
 
-export type ChecklistScreenRouteProp = RouteProp<StackParamList, 'Occurrences'>;
+export type ChecklistScreenRouteProp = RouteProp<StackParamList, 'Checklist'>;
 
 export type ChecklistScreenNavigationProp = StackNavigationProp<
   StackParamList,

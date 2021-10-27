@@ -11,6 +11,7 @@ import LoadingModal from '~/components/LoadingModal';
 
 import {
   Container,
+  TextEmpty,
   List,
   ContainerList,
   ContainerButtons,
@@ -29,7 +30,8 @@ import {
 const ChecklistScreen: FC = () => {
   const navigation = useNavigation();
   const route = useRoute<ChecklistScreenRouteProp>();
-  const { id: planId } = route.params;
+  console.tron.log(route.params);
+  const { id: planId, gruposapontamentoId } = route.params;
 
   const [listChecklists, setListChecklists] =
     useState<Array<Checklist> | undefined>();
@@ -44,25 +46,28 @@ const ChecklistScreen: FC = () => {
 
       const { data } = response;
 
-      const dataSorted: Array<Checklist> = data.checklist.map(checklist => {
-        const answersSorted = checklist.answers?.sort((a, b) => {
-          const dateA = parseISO(a.dth_resposta);
-          const dateB = parseISO(b.dth_resposta);
+      const dataSorted: Array<Checklist> = data.checklist
+        .filter(
+          checklist => checklist.gruposapontamentoId === gruposapontamentoId,
+        )
+        .map(checklist => {
+          const answersSorted = checklist.answers?.sort((a, b) => {
+            const dateA = parseISO(a.dth_resposta);
+            const dateB = parseISO(b.dth_resposta);
 
-          if (isAfter(dateA, dateB)) {
-            return -1;
-          }
-          return 0;
+            if (isAfter(dateA, dateB)) {
+              return -1;
+            }
+            return 0;
+          });
+
+          return {
+            ...checklist,
+            answers: answersSorted,
+          };
         });
 
-        return {
-          ...checklist,
-          answers: answersSorted,
-        };
-      });
-
       setListChecklists(dataSorted);
-      console.tron.log(dataSorted);
       setLoading(false);
     } catch {
       setLoading(false);
@@ -100,7 +105,6 @@ const ChecklistScreen: FC = () => {
   };
 
   const handlePressDisapprove = (item: Checklist) => {
-    console.tron.log(item);
     Alert.alert('Reprovar', 'Deseja reprovar o checklist?', [
       {
         text: 'Cancelar',
@@ -114,7 +118,6 @@ const ChecklistScreen: FC = () => {
   };
 
   const handlePressApprove = (item: Checklist) => {
-    console.tron.log(item);
     Alert.alert('Aprovar', 'Deseja aprovar o checklist?', [
       {
         text: 'Cancelar',
@@ -132,6 +135,7 @@ const ChecklistScreen: FC = () => {
       <List
         data={listChecklists}
         keyExtractor={(checklist: Checklist) => String(checklist.id)}
+        ListEmptyComponent={<TextEmpty>Nenhum checklist</TextEmpty>}
         renderItem={({ item }) => {
           const status = item.answers?.[0].situacao;
 
