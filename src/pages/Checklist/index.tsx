@@ -90,7 +90,31 @@ const ChecklistScreen: FC = () => {
         checklistId: checklist.id,
         plantaId: planId,
       });
-      loadListChecklists();
+
+      if (type === 'REPROVADO') {
+        Alert.alert(
+          'Sucesso',
+          'Checklist respondido. Deseja inserir uma ocorrência?',
+          [
+            {
+              text: 'Não',
+              style: 'cancel',
+              onPress: () => loadListChecklists(),
+            },
+            {
+              text: 'Sim',
+              onPress: () => {
+                navigation.navigate('Occurrences', {
+                  ...route.params,
+                });
+                loadListChecklists();
+              },
+            },
+          ],
+        );
+      } else {
+        loadListChecklists();
+      }
     } catch (error) {
       Sentry.captureException(error);
       Alert.alert('Ocorreu um erro', `${error}`);
