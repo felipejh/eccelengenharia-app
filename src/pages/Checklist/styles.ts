@@ -22,7 +22,7 @@ export const List = styled(FlatList as new () => FlatList<Checklist>).attrs({
   },
 })``;
 
-export const ContainerList = styled.View`
+export const ContainerList = styled.View<{ status: string }>`
   border-radius: 4px;
   padding: 15px 15px 0;
   elevation: 4;
@@ -31,7 +31,13 @@ export const ContainerList = styled.View`
   shadow-color: ${colors.black_strong};
   shadow-offset: 0px 0px;
   margin: 10px 10px 0;
-  background: ${colors.white};
+
+  background: ${colors.gray_light};
+  ${({ status }) =>
+    status === '' &&
+    `
+    background: ${colors.white};
+  `}
 `;
 
 export const ContainerButtons = styled.View`

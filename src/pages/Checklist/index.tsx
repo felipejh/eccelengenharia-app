@@ -181,7 +181,7 @@ const ChecklistScreen: FC = () => {
           const status = item.answers?.[0].situacao;
 
           return (
-            <ContainerList>
+            <ContainerList status={status || ''}>
               <TextItemConferir>{item.item_conferir}</TextItemConferir>
               <ContainerTolerancia>
                 <TextToleranciaLabel>Tolerância: </TextToleranciaLabel>
