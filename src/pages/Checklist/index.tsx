@@ -2,12 +2,14 @@ import React, { FC, useState, useEffect } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
-import { parseISO, isAfter } from 'date-fns';
+import { parseISO, isAfter, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import * as Sentry from '@sentry/react-native';
 import { Checklist, ChecklistScreenRouteProp } from '~/models/checklist.model';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
 import LoadingModal from '~/components/LoadingModal';
+import { ChecklistAnswer } from '~/models/checklist-answers.model';
 
 import {
   Container,
@@ -25,6 +27,9 @@ import {
   ContainerStatus,
   TextStatusLabel,
   TextStatusValue,
+  ContainerUser,
+  TextUserLabel,
+  TextUserValue,
 } from './styles';
 
 const ChecklistScreen: FC = () => {
@@ -51,15 +56,27 @@ const ChecklistScreen: FC = () => {
           checklist => checklist.gruposapontamentoId === gruposapontamentoId,
         )
         .map(checklist => {
-          const answersSorted = checklist.answers?.sort((a, b) => {
-            const dateA = parseISO(a.dth_resposta);
-            const dateB = parseISO(b.dth_resposta);
+          const answersSorted = checklist.answers
+            ?.map((answer: ChecklistAnswer) => ({
+              ...answer,
+              dateAnswerFormatted: answer.dth_resposta
+                ? format(parseISO(answer.dth_resposta), 'dd/MM/yyyy', {
+                    locale: ptBR,
+                  })
+                : '',
+            }))
+            .sort((a, b) => {
+              if (a.dth_resposta && b.dth_resposta) {
+                const dateA = parseISO(a.dth_resposta);
+                const dateB = parseISO(b.dth_resposta);
 
-            if (isAfter(dateA, dateB)) {
-              return -1;
-            }
-            return 0;
-          });
+                if (isAfter(dateA, dateB)) {
+                  return -1;
+                }
+              }
+
+              return 0;
+            });
 
           return {
             ...checklist,
@@ -176,9 +193,20 @@ const ChecklistScreen: FC = () => {
                 {status ? (
                   <TextStatusValue status={status}>{status}</TextStatusValue>
                 ) : (
-                  <TextStatusValue>Não respondido</TextStatusValue>
+                  <TextStatusValue>Não informado</TextStatusValue>
                 )}
               </ContainerStatus>
+
+              {status && (
+                <ContainerUser>
+                  <TextUserLabel>Por: </TextUserLabel>
+
+                  <TextUserValue>
+                    {item.answers?.[0].usuarioCreate.nome} -
+                    {item.answers?.[0].dateAnswerFormatted}
+                  </TextUserValue>
+                </ContainerUser>
+              )}
 
               <ContainerButtons>
                 <TouchableOpacity onPress={() => handlePressDetails(item)}>

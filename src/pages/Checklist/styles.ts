@@ -100,3 +100,19 @@ export const TextStatusValue = styled.Text<{ status?: string }>`
     color: ${colors.red};
   `}
 `;
+
+export const ContainerUser = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const TextUserLabel = styled.Text`
+  font-family: ${fonts.heading};
+  color: ${colors.black_light};
+`;
+
+export const TextUserValue = styled.Text`
+  font-family: ${fonts.text};
+  color: ${colors.black_light};
+  text-transform: capitalize;
+`;
