@@ -7,7 +7,16 @@ import { Group } from '~/models/groups.model';
 import api from '~/services/api';
 import LoadingModal from '~/components/LoadingModal';
 
-import { Container, TextTitle, List, ContainerList, TextGroup } from './styles';
+import {
+  Container,
+  TextTitle,
+  List,
+  ContainerList,
+  IconRight,
+  TextGroup,
+  ContainerIcon,
+  ContainerText,
+} from './styles';
 import { ChecklistScreenRouteProp } from '~/models/checklist.model';
 
 const AppointmentsGroups: React.FC = () => {
@@ -65,13 +74,20 @@ const AppointmentsGroups: React.FC = () => {
 
       <List
         data={listGroups}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(group: Group) => String(group.id)}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handlePressItem(item)}>
             <ContainerList>
-              <TextGroup>
-                {item.id} - {item.titulo}
-              </TextGroup>
+              <ContainerText>
+                <TextGroup>
+                  {item.id} - {item.titulo}
+                </TextGroup>
+              </ContainerText>
+
+              <ContainerIcon>
+                <IconRight name="chevron-right" size={20} />
+              </ContainerIcon>
             </ContainerList>
           </TouchableOpacity>
         )}
