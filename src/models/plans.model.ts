@@ -1,6 +1,7 @@
 ﻿import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamList } from '~/routes/@types';
+import { Checklist } from './checklist.model';
 import { Construction } from './construction.model';
 
 export type PlansScreenRouteProp = RouteProp<StackParamList, 'Plans'>;
@@ -30,4 +31,5 @@ export interface Plan {
   createdAt: string;
   updatedAt: string;
   imgSystemPath?: string;
+  checklist: Array<Checklist>;
 }
