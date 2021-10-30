@@ -131,22 +131,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    def date = new Date()
-    def minuteTimeStamp =  (date.getTime()).toString().take(8)
-    def formattedDate = "00" + minuteTimeStamp
-    if (project.env.get("MODE").equals("alpha")) {
-        formattedDate = "01" + minuteTimeStamp
-    }
-    if (project.env.get("MODE").equals("beta")) {
-        formattedDate = "02" + minuteTimeStamp
-    }
-    def code = formattedDate.toInteger()
-
     defaultConfig {
         applicationId "com.tecnosys.eccelengenharia"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode code
+        versionCode 32
         versionName "1.1.1"
     }
     splits {
