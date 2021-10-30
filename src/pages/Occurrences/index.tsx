@@ -16,6 +16,7 @@ import {
   postOccurrence,
   putPostponedOccurrence,
   putConclusionOccurrence,
+  getOccurrenceByPlan,
 } from '~/services/occurrencesServices';
 
 import {
@@ -42,6 +43,7 @@ import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence'
 import { Appointment } from '~/models/appointment.model';
 import getRealm from '~/services/realm';
 import { normalizeRealmData } from '~/utils/utils';
+import { getGroups } from '~/services/groupsService';
 
 interface NormalizedMarker {
   top: string;
@@ -156,18 +158,34 @@ const Occurrences: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // async function loadOccurrences() {
-    //   const response = await getOccurrenceByPlan({
-    //     constructionId,
-    //     planId,
-    //   });
+    async function loadOccurrencesOnline() {
+      const response = await getOccurrenceByPlan({
+        constructionId,
+        planId,
+      });
 
-    //   setMarkers(response);
+      setMarkers(response);
 
-    //   const newFilteredMarkers = response.filter(m => !m.concluido);
-    //   setNotConcludedMarkers(newFilteredMarkers);
-    //   setFilteredMarkers(newFilteredMarkers);
-    // }
+      const newFilteredMarkers = response.filter(m => !m.concluido);
+      setNotConcludedMarkers(newFilteredMarkers);
+      setFilteredMarkers(newFilteredMarkers);
+    }
+
+    async function loadGroups() {
+      const response = await getGroups();
+      const groupsFiltered = response
+        .filter(g => g.ativo === 1)
+        .sort((a, b) => {
+          if (a.id < b.id) {
+            return -1;
+          }
+          return 0;
+        });
+
+      setGroups(groupsFiltered);
+      setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
+    }
+
     async function loadOccurrences() {
       const realm = await getRealm();
       try {
@@ -215,6 +233,8 @@ const Occurrences: React.FC = () => {
 
     if (width > 0 && height > 0) {
       loadOccurrences();
+      loadOccurrencesOnline();
+      loadGroups();
     }
   }, [width, height]);
 

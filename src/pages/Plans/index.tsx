@@ -77,9 +77,17 @@ const Plans: React.FC = () => {
         '/api/v1/plantas',
       );
 
-      const apiPlans = response.data.filter(
-        plan => plan.obraId === constructionId && plan.ativo === 1,
-      );
+      const apiPlans = response.data
+        .filter(plan => plan.obraId === constructionId && plan.ativo === 1)
+        .sort((a, b) => {
+          if (a.nome < b.nome) {
+            return -1;
+          }
+          return 0;
+        });
+
+      // const test = sortBy(apiPlans, 'nome');
+      // console.tron.log(test);
 
       const newApiPlans = await getPlansModelAdapter(apiPlans);
 
@@ -111,7 +119,7 @@ const Plans: React.FC = () => {
   const handleFilter = (planName: string) => {
     if (planName) {
       const filtered = listPlans.filter(p =>
-        p.name.toLowerCase().includes(planName.toLowerCase()),
+        p.nome.toLowerCase().startsWith(planName.toLowerCase()),
       );
       setFilteredPlans(filtered);
     } else {
