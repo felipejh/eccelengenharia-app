@@ -148,7 +148,7 @@ const SignIn: React.FC = () => {
             </SignUpButton>
           </FormContainer>
 
-          <VersionText>V 1.1.0</VersionText>
+          <VersionText>V 1.1.1</VersionText>
         </Background>
       </ScrollView>
     </KeyboardAvoidingView>
