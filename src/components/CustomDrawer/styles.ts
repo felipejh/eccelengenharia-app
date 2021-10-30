@@ -33,6 +33,13 @@ export const TextLastSyncDate = styled.Text`
   padding: 0 20px;
 `;
 
+export const VersionText = styled.Text`
+  font-family: ${fonts.text};
+  text-align: right;
+  color: ${colors.white};
+  margin: 10px;
+  bottom: 0;
+`;
 // contentContainerStyle: { backgroundColor: colors.orange_light },
 // style: { backgroundColor: colors.orange_light, paddingVertical: 20 },
 // activeTintColor: colors.white,

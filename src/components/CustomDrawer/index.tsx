@@ -22,6 +22,7 @@ import {
   SyncButton,
   SyncButtonText,
   TextLastSyncDate,
+  VersionText,
 } from './styles';
 import { deleteImgFolder } from '~/utils/utils';
 
@@ -78,6 +79,8 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       </SyncButton>
 
       <DrawerItem onPress={handleSignOut} label="SAIR" {...props} />
+
+      <VersionText>V 1.1.0</VersionText>
     </DrawerContentScrollView>
   );
 };

@@ -22,6 +22,7 @@ import {
   Logo,
   SignUpButton,
   SignUpText,
+  VersionText,
 } from './styles';
 
 import bgLogin from '~/assets/bg_login.png';
@@ -146,6 +147,8 @@ const SignIn: React.FC = () => {
               <SignUpText>CADASTRE-SE</SignUpText>
             </SignUpButton>
           </FormContainer>
+
+          <VersionText>V 1.1.0</VersionText>
         </Background>
       </ScrollView>
     </KeyboardAvoidingView>

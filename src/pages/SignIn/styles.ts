@@ -30,3 +30,9 @@ export const SignUpText = styled.Text`
   font-family: ${fonts.text};
   font-size: 12px;
 `;
+
+export const VersionText = styled.Text`
+  font-family: ${fonts.text};
+  text-align: center;
+  color: ${colors.white};
+`;
