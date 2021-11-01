@@ -29,6 +29,7 @@ import bgLogin from '~/assets/bg_login.png';
 import logo from '~/assets/logo_inicial.png';
 import { RootState } from '~/store/modules/rootReducer';
 import colors from '~/styles/colors';
+import appData from '~/config/appData';
 
 interface SignInFormData {
   user: string;
@@ -148,7 +149,7 @@ const SignIn: React.FC = () => {
             </SignUpButton>
           </FormContainer>
 
-          <VersionText>V 1.1.1</VersionText>
+          <VersionText>{appData.version}</VersionText>
         </Background>
       </ScrollView>
     </KeyboardAvoidingView>

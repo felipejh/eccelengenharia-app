@@ -25,6 +25,7 @@ import {
   VersionText,
 } from './styles';
 import { deleteImgFolder } from '~/utils/utils';
+import appData from '~/config/appData';
 
 const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const dispatch = useDispatch();
@@ -80,7 +81,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
 
       <DrawerItem onPress={handleSignOut} label="SAIR" {...props} />
 
-      <VersionText>V 1.1.0</VersionText>
+      <VersionText>{appData.version}</VersionText>
     </DrawerContentScrollView>
   );
 };

@@ -35,7 +35,6 @@ import {
 const ChecklistScreen: FC = () => {
   const navigation = useNavigation();
   const route = useRoute<ChecklistScreenRouteProp>();
-  console.tron.log(route.params);
   const { id: planId, gruposapontamentoId } = route.params;
 
   const [listChecklists, setListChecklists] =
