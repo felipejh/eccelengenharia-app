@@ -6,7 +6,7 @@ const ConstructionSchema = {
     url: 'string',
     nome: 'string',
     tipo: 'int',
-    percentualConclusao: 'string',
+    percentualConclusao: 'double',
     imagem: 'string',
     ativo: 'int',
     createdAt: 'string',

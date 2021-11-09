@@ -22,8 +22,8 @@ export type OccurrencesProps = {
 export interface Occurrence {
   id: number;
   descricao: string;
-  coord_x: string;
-  coord_y: string;
+  coord_x: number;
+  coord_y: number;
   concluido: number;
   dataConclusao: string | null;
   adiado: number;

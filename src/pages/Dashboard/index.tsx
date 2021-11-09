@@ -76,8 +76,8 @@ const Dashboard: FC<ConstructionProps> = () => {
         });
 
         realm.close();
-      } catch {
-        Alert.alert('Atenção', 'Ocorreu um erro ao buscar as obras');
+      } catch (error) {
+        Alert.alert('Atenção', `Ocorreu um erro ao buscar as obras: ${error}`);
       }
     }
   }

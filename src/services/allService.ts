@@ -45,7 +45,8 @@ export async function getAllData(): Promise<void> {
 
     if (response.status !== 200) {
       Alert.alert(
-        'Ocorreu um erro ao sincronizar os dados para operar em modo offline',
+        'Ops',
+        `Ocorreu um erro ao sincronizar os dados para operar em modo offline 1: ${response.status}`,
       );
       return;
     }
@@ -112,7 +113,8 @@ export async function getAllData(): Promise<void> {
     realm.close();
   } catch (error) {
     Alert.alert(
-      'Ocorreu um erro ao sincronizar os dados para operar em modo offline.',
+      'Ops',
+      `Ocorreu um erro ao sincronizar os dados para operar em modo offline 2: ${error}`,
     );
   }
 }

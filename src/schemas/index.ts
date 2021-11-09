@@ -5,6 +5,7 @@ import ConstructionSchema from '~/schemas/ConstructionSchema';
 import ChecklistsSchema from '~/schemas/ChecklistsSchema';
 import PlansSchema from '~/schemas/PlansSchema';
 import ChecklistsAnswersSchema from '~/schemas/ChecklistsAnswersSchema';
+import User from '~/schemas/UserSchema';
 
 export {
   OccurrenceSchema,
@@ -14,4 +15,5 @@ export {
   ChecklistsSchema,
   PlansSchema,
   ChecklistsAnswersSchema,
+  User,
 };

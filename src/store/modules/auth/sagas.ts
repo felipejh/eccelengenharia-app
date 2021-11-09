@@ -25,7 +25,7 @@ export function* signIn({ payload }: SignInRequestAction): any {
     const { data } = response;
 
     if (data.error) {
-      Alert.alert(data.error[0].type, data.error[0].message);
+      Alert.alert(data.error[0].type, `${data.error[0].message} - ${API_URL}`);
       return yield put(signInFailure());
     }
 

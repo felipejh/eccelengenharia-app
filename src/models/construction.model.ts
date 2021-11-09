@@ -21,7 +21,7 @@ export interface Construction {
   id: number;
   nome: string;
   tipo: number;
-  percentualConclusao: string;
+  percentualConclusao: number;
   ativo: number;
   usuarioCreateId: number;
   usuarioUpdateId: number;

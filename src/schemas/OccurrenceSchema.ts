@@ -4,8 +4,8 @@ const OccurrenceSchema = {
   properties: {
     id: 'int',
     descricao: 'string?',
-    coord_x: 'string',
-    coord_y: 'string',
+    coord_x: 'double',
+    coord_y: 'double',
     concluido: 'int?',
     dataConclusao: 'string?',
     adiado: 'int?',
@@ -20,6 +20,7 @@ const OccurrenceSchema = {
     usuarioConclusaoId: 'int?',
     usuarioCreateId: 'int?',
     usuarioUpdateId: 'int?',
+    usuario: 'User',
   },
 };
 
