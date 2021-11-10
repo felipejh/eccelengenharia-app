@@ -30,8 +30,8 @@ export interface Construction {
   updatedAt: string;
   img: string;
   descType: string;
-  solvedOccurrences: number;
-  pendingOccurrences: number;
+  solvedOccurrences: string;
+  pendingOccurrences: string;
   imagem: string;
   imgSystemPath?: string;
 }

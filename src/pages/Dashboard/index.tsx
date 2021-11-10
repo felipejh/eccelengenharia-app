@@ -44,6 +44,19 @@ const Dashboard: FC<ConstructionProps> = () => {
     useState<Array<Construction>>(listConstruction);
 
   async function loadConstructionList() {
+    try {
+      const realm = await getRealm();
+      const data = realm
+        .objects('Construction')
+        .sorted('percentualConclusao', true);
+
+      setListConstruction(JSON.parse(JSON.stringify(data)));
+      setFilteredConstructions(JSON.parse(JSON.stringify(data)));
+      realm.close();
+    } catch (error) {
+      Alert.alert('Atenção', `Ocorreu um erro ao buscar as obras2: ${error}`);
+    }
+
     if (await isConnected()) {
       try {
         const response: AxiosResponse<Array<Construction>> = await api.get(
@@ -162,15 +175,17 @@ const Dashboard: FC<ConstructionProps> = () => {
     }
   };
 
-  const handleNavigateToPlans = ({
-    id,
-    descType,
-    nome,
-    imgSystemPath,
-    percentualConclusao,
-    solvedOccurrences,
-    pendingOccurrences,
-  }: Construction) => {
+  const handleNavigateToPlans = (item: Construction) => {
+    const {
+      id,
+      descType,
+      nome,
+      imgSystemPath,
+      percentualConclusao,
+      solvedOccurrences,
+      pendingOccurrences,
+    } = item;
+
     navigation.navigate('Plans', {
       id,
       descType,

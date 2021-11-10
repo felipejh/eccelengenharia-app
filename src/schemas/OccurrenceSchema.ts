@@ -21,6 +21,7 @@ const OccurrenceSchema = {
     usuarioCreateId: 'int?',
     usuarioUpdateId: 'int?',
     usuario: 'User',
+    apontamento: 'Appointments',
   },
 };
 

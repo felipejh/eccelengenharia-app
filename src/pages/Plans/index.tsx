@@ -50,8 +50,8 @@ const Plans: React.FC = () => {
     id: constructionId,
     imgSystemPath,
     percentualConclusao,
-    solvedOccurrences = 0,
-    pendingOccurrences = 0,
+    solvedOccurrences = '0',
+    pendingOccurrences = '0',
   } = route.params;
 
   const [listPlans, setListPlans] = useState<Array<Plan>>([]);

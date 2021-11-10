@@ -15,6 +15,8 @@ const ConstructionSchema = {
     usuarioUpdateId: 'int?',
     descType: 'string',
     imgSystemPath: 'string?',
+    solvedOccurrences: 'string',
+    pendingOccurrences: 'string',
   },
 };
 
