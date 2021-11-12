@@ -26,6 +26,7 @@ import {
 } from './styles';
 import { deleteImgFolder } from '~/utils/utils';
 import appData from '~/config/appData';
+import getRealm from '~/services/realm';
 
 const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const dispatch = useDispatch();
@@ -53,7 +54,15 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
         text: 'Sim',
         onPress: async () => {
           await deleteImgFolder();
+
+          const realm = await getRealm();
+          realm.write(() => {
+            realm.deleteAll();
+          });
+          realm.close();
+
           dispatch(signOut());
+          dispatch(setLastSyncDate(undefined));
         },
       },
     ]);

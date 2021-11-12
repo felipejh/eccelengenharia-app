@@ -42,8 +42,9 @@ import DropdownSelect from '~/components/DropdownSelect';
 import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence';
 import { Appointment } from '~/models/appointment.model';
 import getRealm from '~/services/realm';
-import { normalizeRealmData } from '~/utils/utils';
+import { normalizeRealmData, isConnected } from '~/utils/utils';
 import { getGroups } from '~/services/groupsService';
+import LoadingModal from '~/components/LoadingModal';
 
 interface NormalizedMarker {
   top: string;
@@ -157,35 +158,71 @@ const Occurrences: React.FC = () => {
     getImageSize();
   }, []);
 
-  useEffect(() => {
-    async function loadOccurrencesOnline() {
-      const response = await getOccurrenceByPlan({
-        constructionId,
-        planId,
-      });
-
-      setMarkers(response);
-
-      const newFilteredMarkers = response.filter(m => !m.concluido);
-      setNotConcludedMarkers(newFilteredMarkers);
-      setFilteredMarkers(newFilteredMarkers);
-    }
-
-    async function loadGroups() {
-      const response = await getGroups();
-      const groupsFiltered = response
-        .filter(g => g.ativo === 1)
-        .sort((a, b) => {
-          if (a.id < b.id) {
-            return -1;
-          }
-          return 0;
+  async function loadOccurrencesOnline() {
+    if (await isConnected()) {
+      try {
+        const response = await getOccurrenceByPlan({
+          constructionId,
+          planId,
         });
 
-      setGroups(groupsFiltered);
-      setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
-    }
+        setMarkers(response);
 
+        const newFilteredMarkers = response.filter(m => !m.concluido);
+        setNotConcludedMarkers(newFilteredMarkers);
+        setFilteredMarkers(newFilteredMarkers);
+
+        const realm = await getRealm();
+
+        realm.write(() => {
+          response.forEach(marker => {
+            realm.create('Occurrences', marker, Realm.UpdateMode.Modified);
+          });
+        });
+        realm.close();
+      } catch (error) {
+        Sentry.captureException(error);
+        Alert.alert(
+          'Ops',
+          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
+        );
+      }
+    }
+  }
+
+  async function loadGroupsOnline() {
+    if (await isConnected()) {
+      try {
+        const response = await getGroups();
+        const groupsFiltered = response
+          .filter(g => g.ativo === 1)
+          .sort((a, b) => {
+            if (a.id < b.id) {
+              return -1;
+            }
+            return 0;
+          });
+
+        const realm = await getRealm();
+
+        realm.write(() => {
+          response.forEach(group => {
+            realm.create('Groups', group, Realm.UpdateMode.Modified);
+          });
+        });
+
+        realm.close();
+
+        setGroups(groupsFiltered);
+        setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
+      } catch (error) {
+        Sentry.captureException(error);
+        Alert.alert('Ops', `Ocorreu um erro ao buscar os grupos: ${error}`);
+      }
+    }
+  }
+
+  useEffect(() => {
     async function loadOccurrences() {
       const realm = await getRealm();
       try {
@@ -234,7 +271,7 @@ const Occurrences: React.FC = () => {
     if (width > 0 && height > 0) {
       loadOccurrences();
       loadOccurrencesOnline();
-      loadGroups();
+      loadGroupsOnline();
     }
   }, [width, height]);
 
@@ -248,12 +285,15 @@ const Occurrences: React.FC = () => {
     }
   }, [showConcluded, notConcludedMarkers]);
 
-  const clearAllProcess = () => {
+  const clearAllProcess = async () => {
     if (isNewMarker) setIsNewMarker(false);
     if (selectedMarker) setSelectedMarker(undefined);
     if (selectedAppointment) setSelectedAppointment(undefined);
     if (percentageXNewMarker) setPercentageXNewMarker(undefined);
     if (percentageYNewMarker) setPercentageYNewMarker(undefined);
+
+    await loadOccurrencesOnline();
+
     setSelectedGroup(groups ? groups[0].id : undefined);
     setLoadingProcess(false);
   };
@@ -391,6 +431,8 @@ const Occurrences: React.FC = () => {
 
   return (
     <Container>
+      <LoadingModal loading={loadingProcess} text="Carregando..." />
+
       <ImageZoom
         cropWidth={Dimensions.get('window').width}
         cropHeight={Dimensions.get('window').height - headerHeight}
