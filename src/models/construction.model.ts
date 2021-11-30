@@ -34,5 +34,5 @@ export interface Construction {
   pendingOccurrences: string;
   imagem: string;
   imgSystemPath?: string;
-  imgUrl?: string;
+  imgUrl: string;
 }

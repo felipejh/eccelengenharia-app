@@ -64,7 +64,7 @@ const Dashboard: FC<ConstructionProps> = () => {
 
           setListConstruction(newList);
           setFilteredConstructions(newList);
-          console.tron.log(newList);
+
           setLoading(false);
         } catch (error) {
           Alert.alert(
@@ -117,7 +117,7 @@ const Dashboard: FC<ConstructionProps> = () => {
       id,
       descType,
       nome,
-      imgSystemPath,
+      imgUrl,
       percentualConclusao,
       solvedOccurrences,
       pendingOccurrences,
@@ -127,7 +127,7 @@ const Dashboard: FC<ConstructionProps> = () => {
       id,
       descType,
       nome,
-      imgSystemPath,
+      imgUrl,
       percentualConclusao,
       solvedOccurrences,
       pendingOccurrences,
