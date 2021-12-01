@@ -8,7 +8,7 @@ import { useHeaderHeight } from '@react-navigation/stack';
 
 import * as Sentry from '@sentry/react-native';
 
-import ImageZoom, { IOnClick } from 'react-native-image-pan-zoom';
+import ImageZoom, { IOnClick, IOnMove } from 'react-native-image-pan-zoom';
 import pt from 'date-fns/locale/pt';
 import { format, parseISO } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
@@ -378,6 +378,25 @@ const Occurrences: React.FC = () => {
     setShowConcluded(oldValue => !oldValue);
   };
 
+  const onZoom = (position: IOnMove) => {
+    const { scale } = position;
+    if (scale % scale !== 1) return;
+    const value = 100 - scale * 13;
+
+    console.tron.log(value);
+    // setScaleMarkers(value);
+    // setScaleMarkers(oldState => {
+    //   const value = 100 - scale * 13;
+    //   if (oldState - value > 5) {
+    //     return value;
+    //   }
+    //   if (oldState - value <= 5) {
+    //     return value;
+    //   }
+    //   return oldState;
+    // });
+  };
+
   return (
     <Container>
       <LoadingModal loading={loadingProcess} text="Carregando..." />
@@ -388,7 +407,7 @@ const Occurrences: React.FC = () => {
         imageWidth={imageWidth}
         imageHeight={imageHeight}
         onClick={handleNewMarker}
-        // onMove={a => console.tron.log(a)} -> Utilizar para trabalhar o tamanho do marker
+        onMove={onZoom}
       >
         <>
           <Image
