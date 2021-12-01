@@ -383,7 +383,7 @@ const Occurrences: React.FC = () => {
     if (scale % scale !== 1) return;
     const value = 100 - scale * 13;
 
-    console.tron.log(value);
+    // console.tron.log(value);
     // setScaleMarkers(value);
     // setScaleMarkers(oldState => {
     //   const value = 100 - scale * 13;
