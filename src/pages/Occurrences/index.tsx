@@ -85,6 +85,8 @@ const Occurrences: React.FC = () => {
   const [percentageYNewMarker, setPercentageYNewMarker] = useState<number>();
 
   const [markers, setMarkers] = useState<Array<Occurrence>>();
+  const [scaleMarkers, setScaleMarkers] = useState<number>(0);
+
   const [notConcludedMarkers, setNotConcludedMarkers] =
     useState<Array<Occurrence>>();
   const [filteredMarkers, setFilteredMarkers] = useState<Array<Occurrence>>();
@@ -380,21 +382,22 @@ const Occurrences: React.FC = () => {
 
   const onZoom = (position: IOnMove) => {
     const { scale } = position;
-    if (scale % scale !== 1) return;
-    const value = 100 - scale * 13;
+    // if (scale % scale !== 1) return;
+    // console.tron.log(position);
+    // const value = 100 - scale * 13;
 
     // console.tron.log(value);
     // setScaleMarkers(value);
-    // setScaleMarkers(oldState => {
-    //   const value = 100 - scale * 13;
-    //   if (oldState - value > 5) {
-    //     return value;
-    //   }
-    //   if (oldState - value <= 5) {
-    //     return value;
-    //   }
-    //   return oldState;
-    // });
+    setScaleMarkers(oldState => {
+      const value = 100 - scale * 13;
+      if (oldState - value > 5) {
+        return value;
+      }
+      if (oldState - value <= 5) {
+        return value;
+      }
+      return oldState;
+    });
   };
 
   return (
@@ -426,6 +429,7 @@ const Occurrences: React.FC = () => {
 
           {normalizedMarkers?.map(m => (
             <Marker
+              scale={scaleMarkers}
               key={String(Math.random())}
               top={m.top}
               left={m.left}
