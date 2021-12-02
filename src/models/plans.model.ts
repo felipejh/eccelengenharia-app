@@ -32,4 +32,5 @@ export interface Plan {
   updatedAt: string;
   imgSystemPath?: string;
   checklist: Array<Checklist>;
+  imgUrl: string;
 }

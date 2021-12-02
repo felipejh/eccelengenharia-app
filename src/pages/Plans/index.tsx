@@ -1,9 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Alert, RefreshControl } from 'react-native';
+import { API_URL } from 'react-native-dotenv';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
 import { AxiosResponse } from 'axios';
 import { Plan, PlansScreenRouteProp } from '~/models/plans.model';
+import getConstructionType from '~/utils/getConstructionType';
 
 import InputFilter from '~/components/InputFilter';
 
@@ -36,10 +38,8 @@ import {
   TextTypePlan,
   TextNamePlan,
 } from './styles';
-import { isConnected, normalizeRealmData } from '~/utils/utils';
-import getRealm from '~/services/realm';
+import { isConnected } from '~/utils/utils';
 import api from '~/services/api';
-import { getPlansModelAdapter } from '~/services/plansService';
 import ModalChoices from '~/pages/Plans/ModalChoices';
 
 const Plans: React.FC = () => {
@@ -48,73 +48,58 @@ const Plans: React.FC = () => {
 
   const {
     id: constructionId,
-    imgSystemPath,
+    imgUrl,
     percentualConclusao,
     solvedOccurrences = '0',
     pendingOccurrences = '0',
   } = route.params;
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [listPlans, setListPlans] = useState<Array<Plan>>([]);
   const [filteredPlans, setFilteredPlans] = useState<Array<Plan>>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan>();
   const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
 
   async function loadPlans() {
-    const realm = await getRealm();
-
-    const data = realm
-      .objects('Plans')
-      .filtered(`obraId = ${constructionId}`)
-      .sorted('nome');
-
-    const dataNormalized = normalizeRealmData<Array<Plan>>(data);
-
-    setListPlans(dataNormalized);
-    setFilteredPlans(dataNormalized);
-
     if (await isConnected()) {
-      const response: AxiosResponse<Array<Plan>> = await api.get(
-        '/api/v1/plantas',
-      );
+      try {
+        setLoading(true);
 
-      const apiPlans = response.data
-        .filter(plan => plan.obraId === constructionId && plan.ativo === 1)
-        .sort((a, b) => {
-          if (a.nome < b.nome) {
-            return -1;
-          }
-          return 0;
-        });
+        const response: AxiosResponse<Array<Plan>> = await api.get(
+          '/api/v1/plantas',
+        );
 
-      // const test = sortBy(apiPlans, 'nome');
-      // console.tron.log(test);
+        const newPlans = response.data
+          .filter(plan => plan.obraId === constructionId && plan.ativo === 1)
+          .map(plan => ({
+            ...plan,
+            descType: getConstructionType(plan.tipo),
+            imgUrl: `${API_URL}${plan.url}`,
+          }))
+          .sort((a, b) => {
+            if (a.nome < b.nome) {
+              return -1;
+            }
+            return 0;
+          });
 
-      const newApiPlans = await getPlansModelAdapter(apiPlans);
-
-      realm.write(() => {
-        newApiPlans.forEach(plan => {
-          realm.create('Plans', plan, Realm.UpdateMode.All);
-        });
-      });
-
-      setListPlans(newApiPlans);
-      setFilteredPlans(newApiPlans);
+        setListPlans(newPlans);
+        setFilteredPlans(newPlans);
+        setLoading(false);
+      } catch (err) {
+        Alert.alert('Ops', `Ocorreu um erro ao carregar as plantas: ${err}`, [
+          {
+            text: 'OK',
+            onPress: () => setLoading(false),
+          },
+        ]);
+      }
     }
-
-    realm.close();
   }
 
   useEffect(() => {
     loadPlans();
   }, []);
-
-  useEffect(() => {
-    const listPlansConstruction = listPlans.filter(
-      plan => plan.obraId === constructionId,
-    );
-
-    setFilteredPlans(listPlansConstruction);
-  }, [listPlans]);
 
   const handleFilter = (planName: string) => {
     if (planName) {
@@ -159,10 +144,7 @@ const Plans: React.FC = () => {
         <ContainerImgProgress>
           <ConstructionImg
             source={{
-              uri:
-                Platform.OS === 'android'
-                  ? `file://${imgSystemPath}`
-                  : `${imgSystemPath}`,
+              uri: imgUrl,
             }}
           />
           <ContainerProgress>
@@ -219,14 +201,19 @@ const Plans: React.FC = () => {
           numColumns={2}
           // refreshing={loading}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={loadPlans}
+              tintColor="#fff"
+              titleColor="#fff"
+            />
+          }
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handlePressPlan(item)}>
               <ImgPlan
                 source={{
-                  uri:
-                    Platform.OS === 'android'
-                      ? `file://${item.imgSystemPath}`
-                      : `${item.imgSystemPath}`,
+                  uri: item.imgUrl,
                 }}
               />
               <TextTypePlan>{item.descType}</TextTypePlan>

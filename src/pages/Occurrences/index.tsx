@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { View, Dimensions, Image, Alert, Platform } from 'react-native';
+import { View, Dimensions, Image, Alert } from 'react-native';
 
 import { useSelector } from 'react-redux';
 
@@ -8,7 +8,7 @@ import { useHeaderHeight } from '@react-navigation/stack';
 
 import * as Sentry from '@sentry/react-native';
 
-import ImageZoom, { IOnClick } from 'react-native-image-pan-zoom';
+import ImageZoom, { IOnClick, IOnMove } from 'react-native-image-pan-zoom';
 import pt from 'date-fns/locale/pt';
 import { format, parseISO } from 'date-fns';
 import { RootState } from '~/store/modules/rootReducer';
@@ -41,10 +41,10 @@ import Button from '~/components/Button';
 import DropdownSelect from '~/components/DropdownSelect';
 import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence';
 import { Appointment } from '~/models/appointment.model';
-import getRealm from '~/services/realm';
-import { normalizeRealmData, isConnected } from '~/utils/utils';
+import { isConnected } from '~/utils/utils';
 import { getGroups } from '~/services/groupsService';
 import LoadingModal from '~/components/LoadingModal';
+import { getAppointments } from '~/services/appointmentsService';
 
 interface NormalizedMarker {
   top: string;
@@ -62,11 +62,7 @@ export interface ExistsMarkers {
 
 const Occurrences: React.FC = () => {
   const route = useRoute<OccurrencesScreenRouteProp>();
-  const {
-    obraId: constructionId,
-    id: planId,
-    imgSystemPath = '',
-  } = route.params;
+  const { obraId: constructionId, id: planId, imgUrl } = route.params;
 
   const { userId } = useSelector((state: RootState) => state.auth);
 
@@ -144,23 +140,21 @@ const Occurrences: React.FC = () => {
 
   useEffect(() => {
     async function getImageSize() {
-      await Image.getSize(
-        Platform.OS === 'android'
-          ? `file://${imgSystemPath}`
-          : `${imgSystemPath}`,
-        (widthImg, heightImg) => {
-          setWidth(widthImg);
-          setHeight(heightImg);
-        },
-      );
+      await Image.getSize(imgUrl, (widthImg, heightImg) => {
+        setWidth(widthImg);
+        setHeight(heightImg);
+      });
     }
 
     getImageSize();
   }, []);
 
-  async function loadOccurrencesOnline() {
+  async function loadOccurrences() {
     if (await isConnected()) {
       try {
+        setLoadingProcess(true);
+
+        // Ocorrencias
         const response = await getOccurrenceByPlan({
           constructionId,
           planId,
@@ -172,29 +166,9 @@ const Occurrences: React.FC = () => {
         setNotConcludedMarkers(newFilteredMarkers);
         setFilteredMarkers(newFilteredMarkers);
 
-        const realm = await getRealm();
-
-        realm.write(() => {
-          response.forEach(marker => {
-            realm.create('Occurrences', marker, Realm.UpdateMode.Modified);
-          });
-        });
-        realm.close();
-      } catch (error) {
-        Sentry.captureException(error);
-        Alert.alert(
-          'Ops',
-          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
-        );
-      }
-    }
-  }
-
-  async function loadGroupsOnline() {
-    if (await isConnected()) {
-      try {
-        const response = await getGroups();
-        const groupsFiltered = response
+        // Grupos
+        const responseGroups = await getGroups();
+        const groupsFiltered = responseGroups
           .filter(g => g.ativo === 1)
           .sort((a, b) => {
             if (a.id < b.id) {
@@ -203,75 +177,39 @@ const Occurrences: React.FC = () => {
             return 0;
           });
 
-        const realm = await getRealm();
-
-        realm.write(() => {
-          response.forEach(group => {
-            realm.create('Groups', group, Realm.UpdateMode.Modified);
-          });
-        });
-
-        realm.close();
-
-        setGroups(groupsFiltered);
+        setGroups(responseGroups);
         setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
+
+        // Appointments
+        const responseAppointments = await getAppointments();
+        const newAppointments = responseAppointments.sort((a, b) => {
+          if (a.id < b.id) {
+            return -1;
+          }
+          return 1;
+        });
+        setAppointments(newAppointments);
+
+        setLoadingProcess(false);
       } catch (error) {
         Sentry.captureException(error);
-        Alert.alert('Ops', `Ocorreu um erro ao buscar os grupos: ${error}`);
+        Alert.alert(
+          'Ops',
+          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => setLoadingProcess(false),
+            },
+          ],
+        );
       }
     }
   }
 
   useEffect(() => {
-    async function loadOccurrences() {
-      const realm = await getRealm();
-      try {
-        // Occurrences
-        const dataAllOc = realm
-          .objects('Occurrences')
-          .filtered(`obraId = ${constructionId} && plantaId = ${planId}`);
-
-        const normalizedAllOc =
-          normalizeRealmData<Array<Occurrence>>(dataAllOc);
-
-        setMarkers(normalizedAllOc);
-
-        const notConcludedMarkersRealm = realm
-          .objects('Occurrences')
-          .filtered(
-            `concluido != 1 && obraId = ${constructionId} && plantaId = ${planId}`,
-          );
-        const normalizedNotConcludedMarkers = normalizeRealmData<
-          Array<Occurrence>
-        >(notConcludedMarkersRealm);
-
-        setNotConcludedMarkers(normalizedNotConcludedMarkers);
-        setFilteredMarkers(normalizedNotConcludedMarkers);
-
-        // Groups
-        const realmGroups = realm.objects('Groups').sorted('id');
-        const realmGroupsNormalized =
-          normalizeRealmData<Array<Group>>(realmGroups);
-
-        setGroups(realmGroupsNormalized);
-        setSelectedGroup(realmGroupsNormalized[0].id);
-
-        // Appointments
-        const data = realm.objects('Appointments').sorted('id');
-        const normalizedData = normalizeRealmData<Array<Appointment>>(data);
-
-        setAppointments(normalizedData);
-      } catch (error) {
-        Sentry.captureException(error);
-      } finally {
-        realm.close();
-      }
-    }
-
     if (width > 0 && height > 0) {
       loadOccurrences();
-      loadOccurrencesOnline();
-      loadGroupsOnline();
     }
   }, [width, height]);
 
@@ -292,13 +230,15 @@ const Occurrences: React.FC = () => {
     if (percentageXNewMarker) setPercentageXNewMarker(undefined);
     if (percentageYNewMarker) setPercentageYNewMarker(undefined);
 
-    await loadOccurrencesOnline();
+    await loadOccurrences();
 
     setSelectedGroup(groups ? groups[0].id : undefined);
     setLoadingProcess(false);
   };
 
   const handleNewMarker = (event: IOnClick) => {
+    if (!appointments || !groups) return;
+
     if (isNewMarker) {
       setSelectedGroup(groups ? groups[0].id : undefined);
       setIsNewMarker(false);
@@ -309,6 +249,16 @@ const Occurrences: React.FC = () => {
       setSelectedMarker(undefined);
       return;
     }
+
+    const defaultGroupId = groups[0].id;
+    const defaultAppointmentId = appointments
+      .filter(a => a.gruposapontamentoId === defaultGroupId)
+      .shift();
+
+    if (!defaultAppointmentId) return;
+
+    setSelectedGroup(defaultGroupId);
+    setSelectedAppointment(defaultAppointmentId.id);
 
     const top = parseFloat(event.locationY.toFixed(2));
     const left = parseFloat(event.locationX.toFixed(2));
@@ -324,7 +274,6 @@ const Occurrences: React.FC = () => {
     setPercentageXNewMarker(percentageX);
     setPercentageYNewMarker(percentageY);
     setIsNewMarker(true);
-    setSelectedAppointment(appointments ? appointments[0].id : undefined);
   };
 
   const handleClickExistsMarker = (occurrence: Occurrence) => {
@@ -429,6 +378,25 @@ const Occurrences: React.FC = () => {
     setShowConcluded(oldValue => !oldValue);
   };
 
+  const onZoom = (position: IOnMove) => {
+    const { scale } = position;
+    if (scale % scale !== 1) return;
+    const value = 100 - scale * 13;
+
+    // console.tron.log(value);
+    // setScaleMarkers(value);
+    // setScaleMarkers(oldState => {
+    //   const value = 100 - scale * 13;
+    //   if (oldState - value > 5) {
+    //     return value;
+    //   }
+    //   if (oldState - value <= 5) {
+    //     return value;
+    //   }
+    //   return oldState;
+    // });
+  };
+
   return (
     <Container>
       <LoadingModal loading={loadingProcess} text="Carregando..." />
@@ -439,16 +407,13 @@ const Occurrences: React.FC = () => {
         imageWidth={imageWidth}
         imageHeight={imageHeight}
         onClick={handleNewMarker}
-        // onMove={a => console.tron.log(a)} -> Utilizar para trabalhar o tamanho do marker
+        onMove={onZoom}
       >
         <>
           <Image
             style={{ width: imageWidth, height: imageHeight }}
             source={{
-              uri:
-                Platform.OS === 'android'
-                  ? `file://${imgSystemPath}`
-                  : `${imgSystemPath}`,
+              uri: imgUrl,
             }}
           />
           {topNewMarker && leftNewMarker && isNewMarker ? (
