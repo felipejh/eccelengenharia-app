@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, RefreshControl } from 'react-native';
 import { API_URL } from 'react-native-dotenv';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Progress from 'react-native-progress';
@@ -197,10 +197,18 @@ const Plans: React.FC = () => {
         <List
           data={filteredPlans}
           keyExtractor={(plan: Plan) => String(plan.id)}
-          onRefresh={loadPlans}
+          // onRefresh={loadPlans}
           numColumns={2}
-          refreshing={loading}
+          // refreshing={loading}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={loadPlans}
+              tintColor="#fff"
+              titleColor="#fff"
+            />
+          }
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handlePressPlan(item)}>
               <ImgPlan
