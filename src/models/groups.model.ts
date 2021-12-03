@@ -1,5 +1,6 @@
 ﻿export interface Group {
   id: number;
+  ideccel: number;
   titulo: string;
   title: string;
   ativo: number;
