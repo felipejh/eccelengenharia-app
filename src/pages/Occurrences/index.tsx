@@ -85,7 +85,7 @@ const Occurrences: React.FC = () => {
   const [percentageYNewMarker, setPercentageYNewMarker] = useState<number>();
 
   const [markers, setMarkers] = useState<Array<Occurrence>>();
-  const [scaleMarkers, setScaleMarkers] = useState<number>(0);
+  const [scaleMarkers, setScaleMarkers] = useState<number>(100);
 
   const [notConcludedMarkers, setNotConcludedMarkers] =
     useState<Array<Occurrence>>();
@@ -382,6 +382,7 @@ const Occurrences: React.FC = () => {
 
   const onZoom = (position: IOnMove) => {
     const { scale } = position;
+    // console.tron.log(scale);
     // if (scale % scale !== 1) return;
     // console.tron.log(position);
     // const value = 100 - scale * 13;

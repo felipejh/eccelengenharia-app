@@ -34,7 +34,7 @@ const Marker: FC<Props> = ({
   const handleClickMarker = () => {
     if (occurrence && onClickMarker) onClickMarker(occurrence);
   };
-
+  // console.tron.log(scale);
   return (
     <Container top={top} left={left} onPress={handleClickMarker}>
       <>
@@ -75,6 +75,7 @@ const Marker: FC<Props> = ({
                 <Icon
                   name="alert-circle"
                   size={(scale * 18) / 100}
+                  // size={18}
                   color={colors.white}
                 />
               </Circle>
