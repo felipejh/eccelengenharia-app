@@ -1,4 +1,4 @@
-﻿import React, { FC } from 'react';
+﻿import React, { FC, ReactElement } from 'react';
 import RNPickerSelect from 'react-native-picker-select';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { Appointment } from '~/models/appointment.model';
@@ -13,6 +13,7 @@ interface Props {
   selectedValue: number | undefined;
   onValueChange: (groupId: number) => void;
   title?: string;
+  filterComponent: ReactElement;
 }
 
 const DropdownSelect: FC<Omit<Props, 'children'>> = ({
@@ -20,17 +21,23 @@ const DropdownSelect: FC<Omit<Props, 'children'>> = ({
   selectedValue,
   onValueChange,
   title,
+  filterComponent,
 }) => {
   return items && items.length > 0 ? (
     <Container>
       <TextLabel>{title}</TextLabel>
+      {filterComponent}
       <RNPickerSelect
         onValueChange={(groupId: number) => onValueChange(groupId)}
         doneText="Fechar"
         useNativeAndroidPickerStyle={false}
         placeholder={{}}
         items={items.map(item => {
-          let label = String(`${item.id} - ${item.titulo}`);
+          const idScreen = title?.includes('apontamento')
+            ? item.ideccel
+            : item.id;
+
+          let label = String(`${idScreen} - ${item.titulo}`);
           if (label.length > 43) {
             label = `${label.substr(0, 42)}...`;
           }

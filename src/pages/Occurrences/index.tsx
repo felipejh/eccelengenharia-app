@@ -45,6 +45,7 @@ import { isConnected } from '~/utils/utils';
 import { getGroups } from '~/services/groupsService';
 import LoadingModal from '~/components/LoadingModal';
 import { getAppointments } from '~/services/appointmentsService';
+import InputFilter from '~/components/InputFilter';
 
 interface NormalizedMarker {
   top: string;
@@ -74,10 +75,13 @@ const Occurrences: React.FC = () => {
 
   const [selectedGroup, setSelectedGroup] = useState<number>();
   const [groups, setGroups] = useState<Array<Group>>();
+  const [filteredGroups, setFilteredGroups] = useState<Array<Group>>();
 
   const [selectedAppointment, setSelectedAppointment] = useState<number>();
   const [appointments, setAppointments] = useState<Array<Appointment>>();
   const [appointmentsPicker, setAppointmentsPicker] =
+    useState<Array<Appointment>>();
+  const [filteredAppointmentsPicker, setFilteredAppointmentsPicker] =
     useState<Array<Appointment>>();
 
   const [isNewMarker, setIsNewMarker] = useState<boolean>(false);
@@ -131,14 +135,17 @@ const Occurrences: React.FC = () => {
   }, [filteredMarkers]);
 
   useEffect(() => {
-    if (selectedGroup && groups && appointments && selectedGroup) {
+    if (selectedGroup && filteredGroups && appointments && selectedGroup) {
       const filteredAppointments = appointments.filter(
         a => a.gruposapontamentoId === selectedGroup,
       );
 
-      if (filteredAppointments) setAppointmentsPicker(filteredAppointments);
+      if (filteredAppointments) {
+        setAppointmentsPicker(filteredAppointments);
+        setFilteredAppointmentsPicker(filteredAppointments);
+      }
     }
-  }, [selectedGroup, groups, appointments, selectedGroup]);
+  }, [selectedGroup, filteredGroups, appointments, selectedGroup]);
 
   useEffect(() => {
     async function getImageSize() {
@@ -180,6 +187,7 @@ const Occurrences: React.FC = () => {
           });
 
         setGroups(responseGroups);
+        setFilteredGroups(responseGroups);
         setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
 
         // Appointments
@@ -234,15 +242,16 @@ const Occurrences: React.FC = () => {
 
     await loadOccurrences();
 
+    setFilteredGroups(groups);
     setSelectedGroup(groups ? groups[0].id : undefined);
     setLoadingProcess(false);
   };
 
   const handleNewMarker = (event: IOnClick) => {
-    if (!appointments || !groups) return;
+    if (!appointments || !filteredGroups) return;
 
     if (isNewMarker) {
-      setSelectedGroup(groups ? groups[0].id : undefined);
+      setSelectedGroup(filteredGroups ? filteredGroups[0].id : undefined);
       setIsNewMarker(false);
       return;
     }
@@ -252,7 +261,7 @@ const Occurrences: React.FC = () => {
       return;
     }
 
-    const defaultGroupId = groups[0].id;
+    const defaultGroupId = filteredGroups[0].id;
     const defaultAppointmentId = appointments
       .filter(a => a.gruposapontamentoId === defaultGroupId)
       .shift();
@@ -280,7 +289,7 @@ const Occurrences: React.FC = () => {
 
   const handleClickExistsMarker = (occurrence: Occurrence) => {
     if (isNewMarker) {
-      setSelectedGroup(groups ? groups[0].id : undefined);
+      setSelectedGroup(filteredGroups ? filteredGroups[0].id : undefined);
       setIsNewMarker(false);
     }
 
@@ -401,6 +410,30 @@ const Occurrences: React.FC = () => {
     });
   };
 
+  const handleFilterGroups = (text: string) => {
+    if (text) {
+      const filtered = groups?.filter(g => String(g.id).includes(text));
+      if (filtered?.length) {
+        setFilteredGroups(filtered);
+      }
+    } else {
+      setFilteredGroups(groups);
+    }
+  };
+
+  const handleFilterAppointments = (text: string) => {
+    if (text) {
+      const filtered = appointmentsPicker?.filter(a =>
+        String(a.ideccel).includes(text),
+      );
+      if (filtered?.length) {
+        setFilteredAppointmentsPicker(filtered);
+      }
+    } else {
+      setFilteredAppointmentsPicker(appointmentsPicker);
+    }
+  };
+
   return (
     <Container>
       <LoadingModal loading={loadingProcess} text="Carregando..." />
@@ -471,17 +504,29 @@ const Occurrences: React.FC = () => {
           <CardBottom title="NOVA OCORRÊNCIA">
             <DropdownSelect
               title="Selecionar grupo"
-              items={groups}
+              items={filteredGroups}
               selectedValue={selectedGroup}
               onValueChange={(groupId: number) => setSelectedGroup(groupId)}
+              filterComponent={
+                <InputFilter
+                  placeholder="Pesquisar grupo..."
+                  onChangeText={handleFilterGroups}
+                />
+              }
             />
 
             <DropdownSelect
               title="Selecionar apontamento"
-              items={appointmentsPicker}
+              items={filteredAppointmentsPicker}
               selectedValue={selectedAppointment}
               onValueChange={(appointmentId: number) =>
                 setSelectedAppointment(appointmentId)
+              }
+              filterComponent={
+                <InputFilter
+                  placeholder="Pesquisar apontamento..."
+                  onChangeText={handleFilterAppointments}
+                />
               }
             />
 

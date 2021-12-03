@@ -1,5 +1,6 @@
 ﻿export interface Appointment {
   id: number;
+  ideccel: number;
   titulo: string;
   title: string;
   descricao: string;
