@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Alert } from 'react-native';
 
 import {
@@ -8,8 +8,8 @@ import {
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 
-// import { format, parseISO } from 'date-fns';
-// import { ptBR } from 'date-fns/locale';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { signOut } from '~/store/modules/auth/actions';
@@ -19,9 +19,9 @@ import { setLastSyncDate } from '~/store/modules/storage/actions';
 import {
   TextWelcome,
   Line,
-  // SyncButton,
-  // SyncButtonText,
-  // TextLastSyncDate,
+  SyncButton,
+  SyncButtonText,
+  TextLastSyncDate,
   VersionText,
 } from './styles';
 import { deleteImgFolder } from '~/utils/utils';
@@ -30,19 +30,19 @@ import getRealm from '~/services/realm';
 
 const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const dispatch = useDispatch();
-  // const { navigation } = props;
+  const { navigation } = props;
 
   const { displayName } = useSelector((state: RootState) => state.auth);
-  // const { lastSyncDate } = useSelector((state: RootState) => state.storage);
+  const { lastSyncDate } = useSelector((state: RootState) => state.storage);
 
-  // const syncDate = useMemo(() => {
-  //   if (lastSyncDate) {
-  //     return format(parseISO(lastSyncDate), 'dd/MM/yyyy HH:mm:ss', {
-  //       locale: ptBR,
-  //     });
-  //   }
-  //   return '';
-  // }, [lastSyncDate]);
+  const syncDate = useMemo(() => {
+    if (lastSyncDate) {
+      return format(parseISO(lastSyncDate), 'dd/MM/yyyy HH:mm:ss', {
+        locale: ptBR,
+      });
+    }
+    return '';
+  }, [lastSyncDate]);
 
   const handleSignOut = () => {
     Alert.alert('Sair', 'Deseja realmente sair?', [
@@ -68,10 +68,10 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
     ]);
   };
 
-  // const handleSync = async () => {
-  //   dispatch(setLastSyncDate(undefined));
-  //   navigation.closeDrawer();
-  // };
+  const handleSync = async () => {
+    dispatch(setLastSyncDate(undefined));
+    navigation.closeDrawer();
+  };
 
   return (
     <DrawerContentScrollView {...props}>
@@ -83,10 +83,10 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
 
       <DrawerItemList {...props} />
 
-      {/* <SyncButton onPress={handleSync}>
+      <SyncButton onPress={handleSync}>
         <SyncButtonText>SINCRONIZAR</SyncButtonText>
         <TextLastSyncDate>Última: {syncDate}</TextLastSyncDate>
-      </SyncButton> */}
+      </SyncButton>
 
       <DrawerItem onPress={handleSignOut} label="SAIR" {...props} />
 
