@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { View, Dimensions, Image, Alert, Platform } from 'react-native';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRoute } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/stack';
@@ -47,8 +47,6 @@ import { getGroups } from '~/services/groupsService';
 import LoadingModal from '~/components/LoadingModal';
 import InputFilter from '~/components/InputFilter';
 
-import { addOccurrenceRequest } from '~/store/modules/occurrences/actions';
-
 interface NormalizedMarker {
   top: string;
   left: string;
@@ -70,8 +68,6 @@ const Occurrences: React.FC = () => {
     id: planId,
     imgSystemPath = '',
   } = route.params;
-
-  const dispatch = useDispatch();
 
   const { userId } = useSelector((state: RootState) => state.auth);
 
@@ -200,10 +196,10 @@ const Occurrences: React.FC = () => {
         realm.close();
       } catch (error) {
         Sentry.captureException(error);
-        // Alert.alert(
-        //   'Ops',
-        //   `Ocorreu um erro ao buscar as ocorrências: ${error}`,
-        // );
+        Alert.alert(
+          'Ops',
+          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
+        );
       }
     }
   }
@@ -374,28 +370,16 @@ const Occurrences: React.FC = () => {
 
     if (userId) {
       try {
-        // await postOccurrence({
-        //   coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
-        //   coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
-        //   constructionId,
-        //   planId,
-        //   userId,
-        //   userCreateId: userId,
-        //   appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
-        // });
-        dispatch(
-          addOccurrenceRequest({
-            coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
-            coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
-            constructionId,
-            planId,
-            userId,
-            userCreateId: userId,
-            appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
-          }),
-        );
-      } catch (error) {
-        console.tron.log(error);
+        await postOccurrence({
+          coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
+          coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
+          constructionId,
+          planId,
+          userId,
+          userCreateId: userId,
+          appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
+        });
+      } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
     }
@@ -514,7 +498,7 @@ const Occurrences: React.FC = () => {
 
   return (
     <Container>
-      {/* <LoadingModal loading={loadingProcess} text="Carregando..." /> */}
+      <LoadingModal loading={loadingProcess} text="Carregando..." />
 
       <ImageZoom
         cropWidth={Dimensions.get('window').width}
@@ -621,7 +605,7 @@ const Occurrences: React.FC = () => {
             >
               <Button
                 onPress={() => handlePostOccurrence()}
-                // loading={loadingProcess}
+                loading={loadingProcess}
               >
                 CRIAR OCORRÊNCIA
               </Button>

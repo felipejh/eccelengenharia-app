@@ -17,9 +17,9 @@ import colors from './styles/colors';
 
 const App: React.FC = () => {
   useEffect(() => {
-    // codePush.sync({
-    //   installMode: codePush.InstallMode.IMMEDIATE,
-    // });
+    codePush.sync({
+      installMode: codePush.InstallMode.IMMEDIATE,
+    });
 
     SplashScreen.hide();
   }, []);
@@ -40,7 +40,6 @@ const App: React.FC = () => {
   );
 };
 
-// export default codePush({
-//   checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
-// })(App);
-export default App;
+export default codePush({
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+})(App);
