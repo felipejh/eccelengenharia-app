@@ -5,11 +5,14 @@ import { AxiosResponse } from 'axios';
 import { parseISO, isAfter, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as Sentry from '@sentry/react-native';
+import NetInfo from '@react-native-community/netinfo';
+import { useDispatch } from 'react-redux';
 import { Checklist, ChecklistScreenRouteProp } from '~/models/checklist.model';
 import { Plan } from '~/models/plans.model';
 import api from '~/services/api';
 import LoadingModal from '~/components/LoadingModal';
 import { ChecklistAnswer } from '~/models/checklist-answers.model';
+import { enqueueChecklist } from '~/store/modules/offlineQueue/actions';
 
 import {
   Container,
@@ -31,11 +34,22 @@ import {
   TextUserLabel,
   TextUserValue,
 } from './styles';
+import { EnqueueChecklistProps } from '~/store/types/offlineQueue';
 
 const ChecklistScreen: FC = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const route = useRoute<ChecklistScreenRouteProp>();
   const { id: planId, gruposapontamentoId } = route.params;
+
+  const [isConnected, setIsConnected] = useState(true);
+  useEffect(() => {
+    const removeNetInfoSubscription = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected as boolean);
+    });
+
+    return () => removeNetInfoSubscription();
+  }, []);
 
   const [listChecklists, setListChecklists] =
     useState<Array<Checklist> | undefined>();
@@ -99,13 +113,32 @@ const ChecklistScreen: FC = () => {
     checklist: Checklist,
   ) => {
     try {
-      setLoading(true);
-      await api.post('/api/v1/checklists_answers', {
+      const body = {
         situacao: type,
         dth_resposta: new Date(),
         checklistId: checklist.id,
         plantaId: planId,
-      });
+      };
+      if (!isConnected) {
+        const queueData: EnqueueChecklistProps = {
+          id: String(new Date().getTime()),
+          object: {
+            data: body,
+          },
+        };
+
+        dispatch(enqueueChecklist(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        return;
+      }
+
+      setLoading(true);
+      await api.post('/api/v1/checklists_answers', body);
 
       if (type === 'REPROVADO') {
         Alert.alert(

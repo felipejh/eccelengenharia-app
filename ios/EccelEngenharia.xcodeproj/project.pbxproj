@@ -16,6 +16,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BB3366C42678374F00F935F3 /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB3366C22678374E00F935F3 /* Montserrat-SemiBold.ttf */; };
 		BB3366C52678374F00F935F3 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB3366C32678374E00F935F3 /* Montserrat-Regular.ttf */; };
+		BBB920622791033900F44B86 /* libswiftWebKit.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB920612791033900F44B86 /* libswiftWebKit.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		A598169F5626637C321B2E88 /* libPods-EccelEngenharia.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EccelEngenharia.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB3366C22678374E00F935F3 /* Montserrat-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-SemiBold.ttf"; path = "../assets/fonts/Montserrat-SemiBold.ttf"; sourceTree = "<group>"; };
 		BB3366C32678374E00F935F3 /* Montserrat-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-Regular.ttf"; path = "../assets/fonts/Montserrat-Regular.ttf"; sourceTree = "<group>"; };
+		BBB920612791033900F44B86 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
 		C0A8F7776CCF91CA59562933 /* Pods-EccelEngenharia.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EccelEngenharia.debug.xcconfig"; path = "Target Support Files/Pods-EccelEngenharia/Pods-EccelEngenharia.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -65,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBB920622791033900F44B86 /* libswiftWebKit.tbd in Frameworks */,
 				0176A5A4608C4F29E603BEAE /* libPods-EccelEngenharia.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,6 +108,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBB920612791033900F44B86 /* libswiftWebKit.tbd */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				A598169F5626637C321B2E88 /* libPods-EccelEngenharia.a */,
 				8661805761AFF0F4B7DD5D92 /* libPods-EccelEngenharia-EccelEngenhariaTests.a */,
@@ -177,7 +181,6 @@
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				D2FF7E725BE96A1BECF8679E /* [CP] Embed Pods Frameworks */,
 				7BF7C90A96B27BF649A8B3A0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -200,7 +203,6 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				16F8BC77B06D3FE8CD5F7C44 /* [CP] Embed Pods Frameworks */,
 				64D156ADDC7AB719BA9D6221 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -284,23 +286,6 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		16F8BC77B06D3FE8CD5F7C44 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia/Pods-EccelEngenharia-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia/Pods-EccelEngenharia-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia/Pods-EccelEngenharia-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		2A3CE7C6609ED5875C91F3A1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -377,23 +362,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia-EccelEngenhariaTests/Pods-EccelEngenharia-EccelEngenhariaTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D2FF7E725BE96A1BECF8679E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia-EccelEngenhariaTests/Pods-EccelEngenharia-EccelEngenhariaTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia-EccelEngenhariaTests/Pods-EccelEngenharia-EccelEngenhariaTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EccelEngenharia-EccelEngenhariaTests/Pods-EccelEngenharia-EccelEngenhariaTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -517,6 +485,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/swift",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -546,6 +518,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/swift",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -762,6 +738,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/swift",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",

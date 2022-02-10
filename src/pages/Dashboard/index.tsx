@@ -4,11 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AxiosResponse } from 'axios';
 import { differenceInDays, format, parseISO } from 'date-fns';
+import NetInfo from '@react-native-community/netinfo';
 import { RootState } from '~/store/modules/rootReducer';
 import LoadingModal from '~/components/LoadingModal';
 import { Construction, ConstructionProps } from '~/models/construction.model';
 import colors from '~/styles/colors';
-import { isConnected, isExistsEccelFolder } from '~/utils/utils';
+import { isExistsEccelFolder } from '~/utils/utils';
 import { getAllData } from '~/services/allService';
 import { setLastSyncDate } from '~/store/modules/storage/actions';
 
@@ -29,16 +30,61 @@ import getRealm from '~/services/realm';
 import api from '~/services/api';
 import { getConstructionModelAdapter } from '~/services/constructionService';
 
+import {
+  sendQueueService,
+  sendChecklistQueue,
+} from '~/services/offlineQueueService';
+import {
+  dequeueOccurrence,
+  dequeueChecklist,
+} from '~/store/modules/offlineQueue/actions';
+
 const Dashboard: FC<ConstructionProps> = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const { lastSyncDate } = useSelector((state: RootState) => state.storage);
+  const { listOccurrence, listChecklist } = useSelector(
+    (state: RootState) => state.offlineQueue,
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [listConstruction, setListConstruction] = useState<Array<Construction>>(
     [],
   );
+
+  const [isConnected, setIsConnected] = useState(true);
+  useEffect(() => {
+    const removeNetInfoSubscription = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected as boolean);
+    });
+
+    return () => removeNetInfoSubscription();
+  }, []);
+
+  useEffect(() => {
+    const sendQueue = async () => {
+      if (isConnected) {
+        listOccurrence.forEach(async occurrence => {
+          const isSubmitted = await sendQueueService(occurrence);
+
+          if (isSubmitted) {
+            dispatch(dequeueOccurrence({ id: occurrence.id }));
+          }
+        });
+
+        listChecklist.forEach(async checklist => {
+          const isSubmitted = await sendChecklistQueue(checklist);
+
+          if (isSubmitted) {
+            dispatch(dequeueChecklist({ id: checklist.id }));
+          }
+        });
+      }
+    };
+
+    sendQueue();
+  }, [isConnected, listOccurrence]);
 
   const [filteredConstruction, setFilteredConstructions] =
     useState<Array<Construction>>(listConstruction);
@@ -57,7 +103,7 @@ const Dashboard: FC<ConstructionProps> = () => {
       Alert.alert('Atenção', `Ocorreu um erro ao buscar as obras2: ${error}`);
     }
 
-    if (await isConnected()) {
+    if (isConnected) {
       try {
         const response: AxiosResponse<Array<Construction>> = await api.get(
           '/api/v1/obras',

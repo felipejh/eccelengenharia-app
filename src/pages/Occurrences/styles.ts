@@ -56,3 +56,10 @@ export const Line = styled.View`
   width: 90%;
   align-self: center;
 `;
+
+export const TextConnectionStatus = styled.Text`
+  color: ${colors.gray_light};
+  align-self: center;
+  padding: 15px;
+  position: absolute;
+`;

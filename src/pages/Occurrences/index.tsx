@@ -1,7 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { View, Dimensions, Image, Alert, Platform } from 'react-native';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+
+import NetInfo from '@react-native-community/netinfo';
 
 import { useRoute } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/stack';
@@ -36,16 +38,19 @@ import {
   TextDetailsPendingOccurrence,
   Line,
   ContentCardPending,
+  TextConnectionStatus,
 } from './styles';
 import Button from '~/components/Button';
 import DropdownSelect from '~/components/DropdownSelect';
 import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence';
 import { Appointment } from '~/models/appointment.model';
 import getRealm from '~/services/realm';
-import { normalizeRealmData, isConnected } from '~/utils/utils';
+import { normalizeRealmData } from '~/utils/utils';
 import { getGroups } from '~/services/groupsService';
 import LoadingModal from '~/components/LoadingModal';
 import InputFilter from '~/components/InputFilter';
+import { enqueueOccurrence } from '~/store/modules/offlineQueue/actions';
+import { EnqueueOccurrenceProps } from '~/store/types/offlineQueue';
 
 interface NormalizedMarker {
   top: string;
@@ -70,6 +75,12 @@ const Occurrences: React.FC = () => {
   } = route.params;
 
   const { userId } = useSelector((state: RootState) => state.auth);
+  const { listOccurrence } = useSelector(
+    (state: RootState) => state.offlineQueue,
+  );
+  const dispatch = useDispatch();
+
+  const [isConnected, setIsConnected] = useState(true);
 
   const [loadingProcess, setLoadingProcess] = useState<boolean>(false);
 
@@ -114,6 +125,14 @@ const Occurrences: React.FC = () => {
   const [normalizedMarkers, setNormalizedMarkers] = useState<
     Array<NormalizedMarker> | undefined
   >([]);
+
+  useEffect(() => {
+    const removeNetInfoSubscription = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected as boolean);
+    });
+
+    return () => removeNetInfoSubscription();
+  }, []);
 
   useEffect(() => {
     if (width && height) {
@@ -173,7 +192,7 @@ const Occurrences: React.FC = () => {
   }, []);
 
   async function loadOccurrencesOnline() {
-    if (await isConnected()) {
+    if (isConnected) {
       try {
         const response = await getOccurrenceByPlan({
           constructionId,
@@ -205,7 +224,7 @@ const Occurrences: React.FC = () => {
   }
 
   async function loadGroupsOnline() {
-    if (await isConnected()) {
+    if (isConnected) {
       try {
         const response = await getGroups();
         const groupsFiltered = response
@@ -366,19 +385,40 @@ const Occurrences: React.FC = () => {
   };
 
   const handlePostOccurrence = async () => {
-    setLoadingProcess(true);
-
     if (userId) {
+      const body = {
+        coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
+        coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
+        constructionId,
+        planId,
+        userId,
+        userCreateId: userId,
+        appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/post',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+      setLoadingProcess(true);
+
       try {
-        await postOccurrence({
-          coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
-          coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
-          constructionId,
-          planId,
-          userId,
-          userCreateId: userId,
-          appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
-        });
+        await postOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -391,12 +431,34 @@ const Occurrences: React.FC = () => {
     setLoadingProcess(true);
 
     if (userId && selectedMarker?.id) {
+      const body = {
+        id: selectedMarker?.id,
+        postponedUserId: userId,
+        postponedDate: new Date(),
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/postponed',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+
       try {
-        await putPostponedOccurrence({
-          id: selectedMarker?.id,
-          postponedUserId: userId,
-          postponedDate: new Date(),
-        });
+        await putPostponedOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -409,12 +471,34 @@ const Occurrences: React.FC = () => {
     setLoadingProcess(true);
 
     if (userId && selectedMarker?.id) {
+      const body = {
+        id: selectedMarker.id,
+        conclusionUserId: userId,
+        conclusionDate: new Date(),
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/concluded',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+
       try {
-        await putConclusionOccurrence({
-          id: selectedMarker.id,
-          conclusionUserId: userId,
-          conclusionDate: new Date(),
-        });
+        await putConclusionOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -496,9 +580,18 @@ const Occurrences: React.FC = () => {
     }
   };
 
+  const status = useMemo(() => {
+    const statusCon = isConnected ? 'Conectado' : 'Sem conexão';
+    const list = `Itens a sincronizar: ${listOccurrence.length}`;
+
+    return `${statusCon} - ${list}`;
+  }, [isConnected, listOccurrence]);
+
   return (
     <Container>
       <LoadingModal loading={loadingProcess} text="Carregando..." />
+
+      <TextConnectionStatus>{status}</TextConnectionStatus>
 
       <ImageZoom
         cropWidth={Dimensions.get('window').width}
