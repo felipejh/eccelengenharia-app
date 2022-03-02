@@ -42,6 +42,8 @@ import api from '~/services/api';
 import { getPlansModelAdapter } from '~/services/plansService';
 import ModalChoices from '~/pages/Plans/ModalChoices';
 
+import NoImage from '~/assets/sem-imagem.jpg';
+
 const Plans: React.FC = () => {
   const route = useRoute<PlansScreenRouteProp>();
   const navigation = useNavigation();
@@ -221,14 +223,19 @@ const Plans: React.FC = () => {
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handlePressPlan(item)}>
-              <ImgPlan
-                source={{
-                  uri:
-                    Platform.OS === 'android'
-                      ? `file://${item.imgSystemPath}`
-                      : `${item.imgSystemPath}`,
-                }}
-              />
+              {item.imgSystemPath?.includes('.jpg') ? (
+                <ImgPlan
+                  source={{
+                    uri:
+                      Platform.OS === 'android'
+                        ? `file://${item.imgSystemPath}`
+                        : `${item.imgSystemPath}`,
+                  }}
+                />
+              ) : (
+                <ImgPlan source={NoImage} />
+              )}
+
               <TextTypePlan>{item.descType}</TextTypePlan>
               <TextNamePlan>{item.nome}</TextNamePlan>
             </ContainerPlan>
