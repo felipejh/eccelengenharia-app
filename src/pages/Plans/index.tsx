@@ -223,7 +223,8 @@ const Plans: React.FC = () => {
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ContainerPlan onPress={() => handlePressPlan(item)}>
-              {item.imgSystemPath?.includes('.jpg') ? (
+              {item.imgSystemPath?.includes('.jpg') ||
+              item.imgSystemPath?.includes('.png') ? (
                 <ImgPlan
                   source={{
                     uri:
@@ -236,7 +237,7 @@ const Plans: React.FC = () => {
                 <ImgPlan source={NoImage} />
               )}
 
-              <TextTypePlan>{item.descType}</TextTypePlan>
+              <TextTypePlan>{item.imgSystemPath}</TextTypePlan>
               <TextNamePlan>{item.nome}</TextNamePlan>
             </ContainerPlan>
           )}
