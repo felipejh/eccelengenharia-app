@@ -138,7 +138,7 @@ export const ImgPlan = styled.Image.attrs({
   width: ${window.width / 2 - 22}px;
   height: ${window.width / 2 - 11}px;
   border-radius: 8px;
-  flex: 1;
+  /* flex: 1; */
 `;
 
 export const TextTypePlan = styled.Text`
