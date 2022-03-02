@@ -6,7 +6,7 @@ export default (reducers: any) => {
     {
       key: '@sistemaconstrutora',
       storage: AsyncStorage,
-      whitelist: ['auth', 'storage'],
+      whitelist: ['auth', 'storage', 'offlineQueue'],
     },
     reducers,
   );

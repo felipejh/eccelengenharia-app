@@ -1,7 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
-import { View, Dimensions, Image, Alert } from 'react-native';
+﻿import React, { useState, useEffect, useMemo } from 'react';
+import { View, Dimensions, Image, Alert, Platform } from 'react-native';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+
+import NetInfo from '@react-native-community/netinfo';
 
 import { useRoute } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/stack';
@@ -36,16 +38,19 @@ import {
   TextDetailsPendingOccurrence,
   Line,
   ContentCardPending,
+  TextConnectionStatus,
 } from './styles';
 import Button from '~/components/Button';
 import DropdownSelect from '~/components/DropdownSelect';
 import ButtonsOccurrence from '~/pages/Occurrences/components/ButtonsOccurrence';
 import { Appointment } from '~/models/appointment.model';
-import { isConnected } from '~/utils/utils';
+import getRealm from '~/services/realm';
+import { normalizeRealmData } from '~/utils/utils';
 import { getGroups } from '~/services/groupsService';
 import LoadingModal from '~/components/LoadingModal';
-import { getAppointments } from '~/services/appointmentsService';
 import InputFilter from '~/components/InputFilter';
+import { enqueueOccurrence } from '~/store/modules/offlineQueue/actions';
+import { EnqueueOccurrenceProps } from '~/store/types/offlineQueue';
 
 interface NormalizedMarker {
   top: string;
@@ -63,9 +68,19 @@ export interface ExistsMarkers {
 
 const Occurrences: React.FC = () => {
   const route = useRoute<OccurrencesScreenRouteProp>();
-  const { obraId: constructionId, id: planId, imgUrl } = route.params;
+  const {
+    obraId: constructionId,
+    id: planId,
+    imgSystemPath = '',
+  } = route.params;
 
   const { userId } = useSelector((state: RootState) => state.auth);
+  const { listOccurrence } = useSelector(
+    (state: RootState) => state.offlineQueue,
+  );
+  const dispatch = useDispatch();
+
+  const [isConnected, setIsConnected] = useState(true);
 
   const [loadingProcess, setLoadingProcess] = useState<boolean>(false);
 
@@ -90,7 +105,6 @@ const Occurrences: React.FC = () => {
 
   const [markers, setMarkers] = useState<Array<Occurrence>>();
   const [scaleMarkers, setScaleMarkers] = useState<number>(100);
-
   const [notConcludedMarkers, setNotConcludedMarkers] =
     useState<Array<Occurrence>>();
   const [filteredMarkers, setFilteredMarkers] = useState<Array<Occurrence>>();
@@ -111,6 +125,14 @@ const Occurrences: React.FC = () => {
   const [normalizedMarkers, setNormalizedMarkers] = useState<
     Array<NormalizedMarker> | undefined
   >([]);
+
+  useEffect(() => {
+    const removeNetInfoSubscription = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected as boolean);
+    });
+
+    return () => removeNetInfoSubscription();
+  }, []);
 
   useEffect(() => {
     if (width && height) {
@@ -135,7 +157,13 @@ const Occurrences: React.FC = () => {
   }, [filteredMarkers]);
 
   useEffect(() => {
-    if (selectedGroup && filteredGroups && appointments && selectedGroup) {
+    if (
+      selectedGroup &&
+      filteredGroups &&
+      groups &&
+      appointments &&
+      selectedGroup
+    ) {
       const filteredAppointments = appointments.filter(
         a => a.gruposapontamentoId === selectedGroup,
       );
@@ -145,25 +173,27 @@ const Occurrences: React.FC = () => {
         setFilteredAppointmentsPicker(filteredAppointments);
       }
     }
-  }, [selectedGroup, filteredGroups, appointments, selectedGroup]);
+  }, [selectedGroup, filteredGroups, groups, appointments, selectedGroup]);
 
   useEffect(() => {
     async function getImageSize() {
-      await Image.getSize(imgUrl, (widthImg, heightImg) => {
-        setWidth(widthImg);
-        setHeight(heightImg);
-      });
+      await Image.getSize(
+        Platform.OS === 'android'
+          ? `file://${imgSystemPath}`
+          : `${imgSystemPath}`,
+        (widthImg, heightImg) => {
+          setWidth(widthImg);
+          setHeight(heightImg);
+        },
+      );
     }
 
     getImageSize();
   }, []);
 
-  async function loadOccurrences() {
-    if (await isConnected()) {
+  async function loadOccurrencesOnline() {
+    if (isConnected) {
       try {
-        setLoadingProcess(true);
-
-        // Ocorrencias
         const response = await getOccurrenceByPlan({
           constructionId,
           planId,
@@ -175,9 +205,29 @@ const Occurrences: React.FC = () => {
         setNotConcludedMarkers(newFilteredMarkers);
         setFilteredMarkers(newFilteredMarkers);
 
-        // Grupos
-        const responseGroups = await getGroups();
-        const groupsFiltered = responseGroups
+        const realm = await getRealm();
+
+        realm.write(() => {
+          response.forEach(marker => {
+            realm.create('Occurrences', marker, Realm.UpdateMode.Modified);
+          });
+        });
+        realm.close();
+      } catch (error) {
+        Sentry.captureException(error);
+        Alert.alert(
+          'Ops',
+          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
+        );
+      }
+    }
+  }
+
+  async function loadGroupsOnline() {
+    if (isConnected) {
+      try {
+        const response = await getGroups();
+        const groupsFiltered = response
           .filter(g => g.ativo === 1)
           .sort((a, b) => {
             if (a.id < b.id) {
@@ -186,40 +236,77 @@ const Occurrences: React.FC = () => {
             return 0;
           });
 
-        setGroups(responseGroups);
-        setFilteredGroups(responseGroups);
-        setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
+        const realm = await getRealm();
 
-        // Appointments
-        const responseAppointments = await getAppointments();
-        const newAppointments = responseAppointments.sort((a, b) => {
-          if (a.id < b.id) {
-            return -1;
-          }
-          return 1;
+        realm.write(() => {
+          response.forEach(group => {
+            realm.create('Groups', group, Realm.UpdateMode.Modified);
+          });
         });
-        setAppointments(newAppointments);
 
-        setLoadingProcess(false);
+        realm.close();
+
+        setGroups(groupsFiltered);
+        setFilteredGroups(groupsFiltered);
+        setSelectedGroup(groupsFiltered ? groupsFiltered[0].id : undefined);
       } catch (error) {
         Sentry.captureException(error);
-        Alert.alert(
-          'Ops',
-          `Ocorreu um erro ao buscar as ocorrências: ${error}`,
-          [
-            {
-              text: 'OK',
-              onPress: () => setLoadingProcess(false),
-            },
-          ],
-        );
+        Alert.alert('Ops', `Ocorreu um erro ao buscar os grupos: ${error}`);
       }
     }
   }
 
   useEffect(() => {
+    async function loadOccurrences() {
+      const realm = await getRealm();
+      try {
+        // Occurrences
+        const dataAllOc = realm
+          .objects('Occurrences')
+          .filtered(`obraId = ${constructionId} && plantaId = ${planId}`);
+
+        const normalizedAllOc =
+          normalizeRealmData<Array<Occurrence>>(dataAllOc);
+
+        setMarkers(normalizedAllOc);
+
+        const notConcludedMarkersRealm = realm
+          .objects('Occurrences')
+          .filtered(
+            `concluido != 1 && obraId = ${constructionId} && plantaId = ${planId}`,
+          );
+        const normalizedNotConcludedMarkers = normalizeRealmData<
+          Array<Occurrence>
+        >(notConcludedMarkersRealm);
+
+        setNotConcludedMarkers(normalizedNotConcludedMarkers);
+        setFilteredMarkers(normalizedNotConcludedMarkers);
+
+        // Groups
+        const realmGroups = realm.objects('Groups').sorted('id');
+        const realmGroupsNormalized =
+          normalizeRealmData<Array<Group>>(realmGroups);
+
+        setGroups(realmGroupsNormalized);
+        setFilteredGroups(realmGroupsNormalized);
+        setSelectedGroup(realmGroupsNormalized[0].id);
+
+        // Appointments
+        const data = realm.objects('Appointments').sorted('id');
+        const normalizedData = normalizeRealmData<Array<Appointment>>(data);
+
+        setAppointments(normalizedData);
+      } catch (error) {
+        Sentry.captureException(error);
+      } finally {
+        realm.close();
+      }
+    }
+
     if (width > 0 && height > 0) {
       loadOccurrences();
+      loadOccurrencesOnline();
+      loadGroupsOnline();
     }
   }, [width, height]);
 
@@ -240,9 +327,8 @@ const Occurrences: React.FC = () => {
     if (percentageXNewMarker) setPercentageXNewMarker(undefined);
     if (percentageYNewMarker) setPercentageYNewMarker(undefined);
 
-    await loadOccurrences();
+    await loadOccurrencesOnline();
 
-    setFilteredGroups(groups);
     setSelectedGroup(groups ? groups[0].id : undefined);
     setLoadingProcess(false);
   };
@@ -285,11 +371,12 @@ const Occurrences: React.FC = () => {
     setPercentageXNewMarker(percentageX);
     setPercentageYNewMarker(percentageY);
     setIsNewMarker(true);
+    setSelectedAppointment(appointments ? appointments[0].id : undefined);
   };
 
   const handleClickExistsMarker = (occurrence: Occurrence) => {
     if (isNewMarker) {
-      setSelectedGroup(filteredGroups ? filteredGroups[0].id : undefined);
+      setSelectedGroup(groups ? groups[0].id : undefined);
       setIsNewMarker(false);
     }
 
@@ -298,19 +385,40 @@ const Occurrences: React.FC = () => {
   };
 
   const handlePostOccurrence = async () => {
-    setLoadingProcess(true);
-
     if (userId) {
+      const body = {
+        coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
+        coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
+        constructionId,
+        planId,
+        userId,
+        userCreateId: userId,
+        appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/post',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+      setLoadingProcess(true);
+
       try {
-        await postOccurrence({
-          coordX: percentageXNewMarker || Number(selectedMarker?.coord_x),
-          coordY: percentageYNewMarker || Number(selectedMarker?.coord_y),
-          constructionId,
-          planId,
-          userId,
-          userCreateId: userId,
-          appointmentId: selectedAppointment || selectedMarker?.apontamentoId,
-        });
+        await postOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -323,12 +431,34 @@ const Occurrences: React.FC = () => {
     setLoadingProcess(true);
 
     if (userId && selectedMarker?.id) {
+      const body = {
+        id: selectedMarker?.id,
+        postponedUserId: userId,
+        postponedDate: new Date(),
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/postponed',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+
       try {
-        await putPostponedOccurrence({
-          id: selectedMarker?.id,
-          postponedUserId: userId,
-          postponedDate: new Date(),
-        });
+        await putPostponedOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -341,12 +471,34 @@ const Occurrences: React.FC = () => {
     setLoadingProcess(true);
 
     if (userId && selectedMarker?.id) {
+      const body = {
+        id: selectedMarker.id,
+        conclusionUserId: userId,
+        conclusionDate: new Date(),
+      };
+
+      if (!isConnected) {
+        const queueData: EnqueueOccurrenceProps = {
+          id: String(new Date().getTime()),
+          object: {
+            typeActionApi: 'occurrence/concluded',
+            data: body,
+          },
+        };
+
+        dispatch(enqueueOccurrence(queueData));
+
+        Alert.alert(
+          'Sem conexão',
+          'Essa ação será efetivada automaticamente assim que sua conexão voltar',
+        );
+
+        clearAllProcess();
+        return;
+      }
+
       try {
-        await putConclusionOccurrence({
-          id: selectedMarker.id,
-          conclusionUserId: userId,
-          conclusionDate: new Date(),
-        });
+        await putConclusionOccurrence(body);
       } catch {
         Alert.alert('Atenção', 'Ocorreu um erro ao efetuar o processo.');
       }
@@ -391,13 +543,7 @@ const Occurrences: React.FC = () => {
 
   const onZoom = (position: IOnMove) => {
     const { scale } = position;
-    // console.tron.log(scale);
-    // if (scale % scale !== 1) return;
-    // console.tron.log(position);
-    // const value = 100 - scale * 13;
 
-    // console.tron.log(value);
-    // setScaleMarkers(value);
     setScaleMarkers(oldState => {
       const value = 100 - scale * 13;
       if (oldState - value > 5) {
@@ -434,9 +580,18 @@ const Occurrences: React.FC = () => {
     }
   };
 
+  const status = useMemo(() => {
+    const statusCon = isConnected ? 'Conectado' : 'Sem conexão';
+    const list = `Itens a sincronizar: ${listOccurrence.length}`;
+
+    return `${statusCon} - ${list}`;
+  }, [isConnected, listOccurrence]);
+
   return (
     <Container>
       <LoadingModal loading={loadingProcess} text="Carregando..." />
+
+      <TextConnectionStatus>{status}</TextConnectionStatus>
 
       <ImageZoom
         cropWidth={Dimensions.get('window').width}
@@ -450,7 +605,10 @@ const Occurrences: React.FC = () => {
           <Image
             style={{ width: imageWidth, height: imageHeight }}
             source={{
-              uri: imgUrl,
+              uri:
+                Platform.OS === 'android'
+                  ? `file://${imgSystemPath}`
+                  : `${imgSystemPath}`,
             }}
           />
           {topNewMarker && leftNewMarker && isNewMarker ? (

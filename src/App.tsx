@@ -9,6 +9,7 @@ import '~/config/ReactotronConfig';
 import codePush from 'react-native-code-push';
 import SplashScreen from 'react-native-splash-screen';
 import * as Sentry from '@sentry/react-native';
+import { OfflineQueueProvider } from './context/OfflineQueue';
 
 import { store, persistor } from '~/store';
 
@@ -33,7 +34,9 @@ const App: React.FC = () => {
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <StatusBar barStyle="light-content" backgroundColor={colors.gray} />
-          <Routes />
+          <OfflineQueueProvider>
+            <Routes />
+          </OfflineQueueProvider>
         </PersistGate>
       </Provider>
     </NavigationContainer>

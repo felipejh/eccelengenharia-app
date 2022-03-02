@@ -9,7 +9,7 @@ interface GetOccurrenceByPlanProps {
 interface GetOccurrenceByPlanService {
   (obj: GetOccurrenceByPlanProps): Promise<Array<Occurrence>>;
 }
-interface PostOccurrenceProps {
+export interface PostOccurrenceProps {
   coordX: number;
   coordY: number;
   constructionId: number;
@@ -19,13 +19,13 @@ interface PostOccurrenceProps {
   userUpdateId?: number;
   appointmentId: number | undefined | null;
 }
-interface PutPostponedProps {
+export interface PutPostponedProps {
   id: number;
   postponedDate: Date;
   postponedUserId: number;
 }
 
-interface PutConclusionProps {
+export interface PutConclusionProps {
   id: number;
   conclusionDate: Date;
   conclusionUserId: number;

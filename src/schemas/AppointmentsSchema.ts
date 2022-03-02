@@ -3,6 +3,7 @@ const AppointmentsSchema = {
   primaryKey: 'id',
   properties: {
     id: 'int',
+    ideccel: 'int',
     titulo: 'string',
     descricao: 'string?',
     ativo: 'int',
