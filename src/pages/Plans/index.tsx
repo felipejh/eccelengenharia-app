@@ -237,7 +237,7 @@ const Plans: React.FC = () => {
                 <ImgPlan source={NoImage} />
               )}
 
-              <TextTypePlan>{item.imgSystemPath}</TextTypePlan>
+              <TextTypePlan>{item.descType}</TextTypePlan>
               <TextNamePlan>{item.nome}</TextNamePlan>
             </ContainerPlan>
           )}
